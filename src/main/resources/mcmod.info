@@ -1,0 +1,16 @@
+[
+{
+  "modid": "hunterillager",
+  "name": "HunterIllager",
+  "description": "add HunterIllager",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["bagu_chan"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

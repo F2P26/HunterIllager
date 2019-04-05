@@ -1,0 +1,7 @@
+#
+entity.hunterillager.HunterIllager.name=HunterIllager
+
+hunterillager:subtitles.hunterillager.laugh=HunterIllager laugh
+
+hunterillager.config.woodhut_gen=WoodHutGen　Rarity
+hunterillager.config.woodhut_gen.tooltip=WoodHut Rarity Given this value as X, 1 hut will spawn in X plain biome and wasteland biome chunks
