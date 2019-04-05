@@ -2,6 +2,7 @@ package baguchan.hunterillager.entity;
 
 import baguchan.hunterillager.HunterIllagerCore;
 import baguchan.hunterillager.HunterSounds;
+import baguchan.hunterillager.entity.ai.EntityAICollectItem;
 import com.google.common.base.Predicate;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.*;
@@ -53,23 +54,24 @@ public class EntityHunterIllager extends AbstractIllager implements IRangedAttac
     {
         this.tasks.addTask(0, new EntityAISwimming(this));
         this.tasks.addTask(1, new EntityAIAttackRangedBow<>(this, 0.95D, 20, 16.0F));
-        this.tasks.addTask(2, new EntityAIMoveIndoors(this));
-        this.tasks.addTask(3, new EntityAIOpenDoor(this, true));
-        this.tasks.addTask(4, new EntityAIMoveTowardsRestriction(this, 1.0D));
-        this.tasks.addTask(5, new EntityAIWander(this, 0.9D));
-        this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 3.0F, 1.0F));
-        this.tasks.addTask(7, new EntityAIWatchClosest(this, EntityLiving.class, 8.0F));
+        this.tasks.addTask(2, new EntityAICollectItem(this, 1.0F));
+        this.tasks.addTask(3, new EntityAIMoveIndoors(this));
+        this.tasks.addTask(4, new EntityAIOpenDoor(this, true));
+        this.tasks.addTask(5, new EntityAIMoveTowardsRestriction(this, 1.0D));
+        this.tasks.addTask(6, new EntityAIWander(this, 0.9D));
+        this.tasks.addTask(7, new EntityAIWatchClosest(this, EntityPlayer.class, 3.0F, 1.0F));
+        this.tasks.addTask(8, new EntityAIWatchClosest(this, EntityLiving.class, 8.0F));
         this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true, AbstractIllager.class));
-        this.targetTasks.addTask(2, (new EntityAINearestAttackableTarget<>(this, EntityPlayer.class, true)).setUnseenMemoryTicks(300));
-        this.targetTasks.addTask(3, (new EntityAINearestAttackableTarget<>(this, EntityVillager.class, false)).setUnseenMemoryTicks(300));
-        this.targetTasks.addTask(3, (new EntityAINearestAttackableTarget<>(this, EntityIronGolem.class, false)).setUnseenMemoryTicks(300));
+        this.targetTasks.addTask(2, (new EntityAINearestAttackableTarget<>(this, EntityPlayer.class, true)));
+        this.targetTasks.addTask(3, (new EntityAINearestAttackableTarget<>(this, EntityVillager.class, false)));
+        this.targetTasks.addTask(3, (new EntityAINearestAttackableTarget<>(this, EntityIronGolem.class, false)));
         this.targetTasks.addTask(3, (new EntityAINearestAttackableTarget<>(this, EntityAnimal.class, 10, true, false, new Predicate<EntityAnimal>()
         {
             public boolean apply(@Nullable EntityAnimal p_apply_1_)
             {
                 return !(p_apply_1_ instanceof EntityTameable) && !(p_apply_1_ instanceof EntityHorse) && !(p_apply_1_ instanceof EntityLlama) && getCooldownTicks() <= 0;
             }
-        }).setUnseenMemoryTicks(400)));
+        })));
     }
 
     @Override
@@ -141,6 +143,10 @@ public class EntityHunterIllager extends AbstractIllager implements IRangedAttac
         }
 
         this.setCanPickUpLoot(true);
+    }
+
+    public InventoryBasic getIllagerInventory(){
+        return illagerInventory;
     }
 
     public boolean isCooldown()
@@ -254,7 +260,7 @@ public class EntityHunterIllager extends AbstractIllager implements IRangedAttac
         }
     }
 
-    private boolean canIllagerPickupItem(Item itemIn)
+    public boolean canIllagerPickupItem(Item itemIn)
     {
         return itemIn == Items.BREAD || itemIn == Items.BEEF || itemIn == Items.COOKED_BEEF|| itemIn == Items.PORKCHOP || itemIn == Items.COOKED_PORKCHOP|| itemIn == Items.CHICKEN|| itemIn == Items.COOKED_CHICKEN|| itemIn == Items.MUTTON || itemIn == Items.COOKED_MUTTON|| itemIn == Items.RABBIT|| itemIn == Items.COOKED_RABBIT;
     }
