@@ -4,11 +4,9 @@ import baguchan.hunterillager.HunterIllagerCore;
 import baguchan.hunterillager.IllagerConfig;
 import baguchan.hunterillager.entity.EntityHunterIllager;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
@@ -71,9 +69,9 @@ public class IllagerWoodHutGenerator implements IWorldGenerator {
         EntityHunterIllager entityHunterIllager = new EntityHunterIllager(worldIn);
         entityHunterIllager.heal(entityHunterIllager.getMaxHealth());
         entityHunterIllager.setLocationAndAngles((double) x + 0.5D, (double) y, (double) z + 0.5D, 0.0F, 0.0F);
-        entityHunterIllager.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityHunterIllager)), (IEntityLivingData) null);
+        entityHunterIllager.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityHunterIllager)), null);
         entityHunterIllager.enablePersistence();
-        entityHunterIllager.setHomePosAndDistance(new BlockPos(x, y, z), 20);
+        entityHunterIllager.setHomePosAndDistance(new BlockPos(x, y, z), 18);
         worldIn.spawnEntity(entityHunterIllager);
         return true;
 

@@ -3,6 +3,7 @@ package baguchan.hunterillager.entity;
 import baguchan.hunterillager.HunterIllagerCore;
 import baguchan.hunterillager.HunterSounds;
 import baguchan.hunterillager.entity.ai.EntityAICollectItem;
+import baguchan.hunterillager.entity.ai.EntityAIHunterMoveTowardsRestriction;
 import com.google.common.base.Predicate;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.*;
@@ -26,6 +27,7 @@ import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
@@ -36,6 +38,10 @@ import javax.annotation.Nullable;
 
 public class EntityHunterIllager extends AbstractIllager implements IRangedAttackMob {
     private final InventoryBasic illagerInventory;
+
+    private BlockPos homePosition = BlockPos.ORIGIN;
+    /** If -1 there is no maximum distance */
+    private float maximumHomeDistance = -1.0F;
 
     protected int eattick = 0;
     private int cooldownTicks;
@@ -57,7 +63,7 @@ public class EntityHunterIllager extends AbstractIllager implements IRangedAttac
         this.tasks.addTask(2, new EntityAICollectItem(this, 1.0F));
         this.tasks.addTask(3, new EntityAIMoveIndoors(this));
         this.tasks.addTask(4, new EntityAIOpenDoor(this, true));
-        this.tasks.addTask(5, new EntityAIMoveTowardsRestriction(this, 1.0D));
+        this.tasks.addTask(5, new EntityAIHunterMoveTowardsRestriction(this, 1.0D));
         this.tasks.addTask(6, new EntityAIWander(this, 0.9D));
         this.tasks.addTask(7, new EntityAIWatchClosest(this, EntityPlayer.class, 3.0F, 1.0F));
         this.tasks.addTask(8, new EntityAIWatchClosest(this, EntityLiving.class, 8.0F));
@@ -103,7 +109,12 @@ public class EntityHunterIllager extends AbstractIllager implements IRangedAttac
     {
         super.writeEntityToNBT(compound);
 
-        this.cooldownTicks = compound.getInteger("CooldownTicks");
+        compound.setInteger("CooldownTicks", this.cooldownTicks);
+
+        compound.setInteger("HomePosX", homePosition.getX());
+        compound.setInteger("HomePosY", homePosition.getY());
+        compound.setInteger("HomePosZ", homePosition.getZ());
+
 
         NBTTagList nbttaglist = new NBTTagList();
 
@@ -128,7 +139,10 @@ public class EntityHunterIllager extends AbstractIllager implements IRangedAttac
     {
         super.readEntityFromNBT(compound);
 
-        compound.setInteger("CooldownTicks", this.cooldownTicks);
+        this.cooldownTicks = compound.getInteger("CooldownTicks");
+
+        homePosition = new BlockPos(compound.getInteger("HomePosX"), compound.getInteger("HomePosY"), compound.getInteger("HomePosZ"));
+
 
         NBTTagList nbttaglist = compound.getTagList("Inventory", 10);
 
@@ -143,6 +157,32 @@ public class EntityHunterIllager extends AbstractIllager implements IRangedAttac
         }
 
         this.setCanPickUpLoot(true);
+    }
+
+    public boolean isWithinHomeDistanceFromPosition(BlockPos pos)
+    {
+        if (this.maximumHomeDistance == -1.0F)
+        {
+            return true;
+        }
+        else
+        {
+            return this.homePosition.distanceSq(pos) < (double)(this.maximumHomeDistance * this.maximumHomeDistance);
+        }
+    }
+
+    /**
+     * Sets home position and max distance for it
+     */
+    public void setHomePosAndDistance(BlockPos pos, int distance)
+    {
+        this.homePosition = pos;
+        this.maximumHomeDistance = (float)distance;
+    }
+
+    public BlockPos getHomePosition()
+    {
+        return this.homePosition;
     }
 
     public InventoryBasic getIllagerInventory(){
@@ -292,7 +332,7 @@ public class EntityHunterIllager extends AbstractIllager implements IRangedAttac
 
             this.playSound(HunterSounds.HUNTER_ILLAGER_LAUGH, this.getSoundVolume() + 0.15F, this.getSoundPitch());
 
-            this.setCooldownTicks(800);
+            this.setCooldownTicks(300);
         }
     }
 
