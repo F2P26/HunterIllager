@@ -21,9 +21,6 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
@@ -62,7 +59,7 @@ public class EntityHunterIllager extends AbstractIllager implements IRangedAttac
         this.tasks.addTask(5, new EntityAIWander(this, 0.9D));
         this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 3.0F, 1.0F));
         this.tasks.addTask(7, new EntityAIWatchClosest(this, EntityLiving.class, 8.0F));
-        this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true, new Class[] {AbstractIllager.class}));
+        this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true, AbstractIllager.class));
         this.targetTasks.addTask(2, (new EntityAINearestAttackableTarget<>(this, EntityPlayer.class, true)).setUnseenMemoryTicks(300));
         this.targetTasks.addTask(3, (new EntityAINearestAttackableTarget<>(this, EntityVillager.class, false)).setUnseenMemoryTicks(300));
         this.targetTasks.addTask(3, (new EntityAINearestAttackableTarget<>(this, EntityIronGolem.class, false)).setUnseenMemoryTicks(300));
@@ -289,7 +286,7 @@ public class EntityHunterIllager extends AbstractIllager implements IRangedAttac
 
             this.playSound(HunterSounds.HUNTER_ILLAGER_LAUGH, this.getSoundVolume() + 0.15F, this.getSoundPitch());
 
-            this.setCooldownTicks(600);
+            this.setCooldownTicks(800);
         }
     }
 
