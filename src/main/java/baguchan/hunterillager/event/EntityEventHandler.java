@@ -1,5 +1,6 @@
 package baguchan.hunterillager.event;
 
+import baguchan.hunterillager.IllagerConfig;
 import baguchan.hunterillager.entity.EntityHunterIllager;
 import net.minecraft.entity.ai.EntityAIAvoidEntity;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -18,9 +19,12 @@ public class EntityEventHandler {
             villager.tasks.addTask(1, new EntityAIAvoidEntity<>(villager, EntityHunterIllager.class, 16.0F, 0.8D, 0.8D));
         }
 
-        if (!(event.getEntity() instanceof EntityTameable) && !(event.getEntity() instanceof EntityLlama) && event.getEntity() instanceof EntityAnimal) {
-            EntityAnimal animal = (EntityAnimal) event.getEntity();
-            animal.tasks.addTask(1, new EntityAIAvoidEntity<>(animal, EntityHunterIllager.class, 16.0F, 1.3D, 1.3D));
+        if(IllagerConfig.animal_RanAway) {
+            if (!(event.getEntity() instanceof EntityTameable) && !(event.getEntity() instanceof EntityLlama) && event.getEntity() instanceof EntityAnimal) {
+                EntityAnimal animal = (EntityAnimal) event.getEntity();
+                animal.tasks.addTask(1, new EntityAIAvoidEntity<>(animal, EntityHunterIllager.class, 12.0F, 1.3D, 1.3D));
+            }
         }
     }
+
 }

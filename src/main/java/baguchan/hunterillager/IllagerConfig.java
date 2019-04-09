@@ -18,6 +18,11 @@ public class IllagerConfig {
     @Config.Comment("WoodHut Rarity Given this value as X, 1 hut will spawn in X plain biome and wasteland biome chunks")
     public static int woodhutGen = 500;
 
+    @Config.LangKey(config + "animal_ranaway")
+    @Config.RequiresMcRestart
+    @Config.Comment("When this is true, animals will run away from HunterIllager")
+    public static boolean animal_RanAway = true;
+
 
     @SubscribeEvent
     public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {

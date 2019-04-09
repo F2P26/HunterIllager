@@ -302,7 +302,7 @@ public class EntityHunterIllager extends AbstractIllager implements IRangedAttac
 
     public boolean canIllagerPickupItem(Item itemIn)
     {
-        return itemIn == Items.BREAD || itemIn == Items.BEEF || itemIn == Items.COOKED_BEEF|| itemIn == Items.PORKCHOP || itemIn == Items.COOKED_PORKCHOP|| itemIn == Items.CHICKEN|| itemIn == Items.COOKED_CHICKEN|| itemIn == Items.MUTTON || itemIn == Items.COOKED_MUTTON|| itemIn == Items.RABBIT|| itemIn == Items.COOKED_RABBIT;
+        return itemIn instanceof ItemFood && ((ItemFood)itemIn).isWolfsFavoriteMeat() && !(itemIn == Items.ROTTEN_FLESH) || itemIn == Items.BREAD;
     }
 
     @Override
