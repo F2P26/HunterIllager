@@ -1,8 +1,8 @@
 #
-entity.hunterillager.HunterIllager.name=HunterIllager
+entity.hunterillager.HunterIllager.name=Hunter Illager
 
-hunterillager:subtitles.hunterillager.laugh=HunterIllager laugh
+hunterillager:subtitles.hunterillager.laugh=Hunter Illager laughs
 
 hunterillager.config.woodhut_gen=WoodHutGen Rarity
 hunterillager.config.woodhut_gen.tooltip=WoodHut Rarity Given this value as X, 1 hut will spawn in X plain biome and wasteland biome chunks
-hunterillager.config.animal_ranaway=Animal avoids HunterIllager
+hunterillager.config.animal_ranaway=Animal avoids Hunter Illager
