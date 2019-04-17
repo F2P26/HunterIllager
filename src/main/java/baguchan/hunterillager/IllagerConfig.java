@@ -15,13 +15,18 @@ public class IllagerConfig {
     @Config.LangKey(config + "woodhut_gen")
     @Config.RequiresMcRestart
     @Config.RangeInt(min = 500, max = 1000)
-    @Config.Comment("WoodHut Rarity Given this value as X, 1 hut will spawn in X plain biome and wasteland biome chunks")
-    public static int woodhutGen = 500;
+    @Config.Comment("WoodHut Rarity Given this value as X, 1 hut will spawn in X plain type biome chunks")
+    public static int woodhutGen = 540;
 
     @Config.LangKey(config + "animal_ranaway")
     @Config.RequiresMcRestart
-    @Config.Comment("When this is true, animals will run away from HunterIllager")
+    @Config.Comment("When this is true, HunterIllager use Dark Oak theme on WoodHut")
     public static boolean animal_RanAway = true;
+
+    @Config.LangKey(config + "illager_use_darkoak_theme")
+    @Config.RequiresMcRestart
+    @Config.Comment("When this is true, HunterIllager ")
+    public static boolean darkoak_theme = false;
 
 
     @SubscribeEvent

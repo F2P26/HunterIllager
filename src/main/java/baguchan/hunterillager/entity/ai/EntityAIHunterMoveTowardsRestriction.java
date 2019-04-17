@@ -32,11 +32,7 @@ public class EntityAIHunterMoveTowardsRestriction extends EntityAIBase {
 
             if (vec3d == null)
             {
-                this.movePosX = blockpos.getX();
-                this.movePosY = blockpos.getY();
-                this.movePosZ = blockpos.getZ();
-
-                return true;
+                return false;
             }
             else
             {

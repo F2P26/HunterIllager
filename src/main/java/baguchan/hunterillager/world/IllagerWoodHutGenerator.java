@@ -23,6 +23,8 @@ import java.util.Random;
 public class IllagerWoodHutGenerator implements IWorldGenerator {
     public static final ResourceLocation WOODHUT = new ResourceLocation(HunterIllagerCore.MODID, "illager_woodhut");
 
+    public static final ResourceLocation WOODHUT_DARKOAK = new ResourceLocation(HunterIllagerCore.MODID, "illager_woodhut_darkoak");
+
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
         if (!(world instanceof WorldServer))
@@ -41,7 +43,7 @@ public class IllagerWoodHutGenerator implements IWorldGenerator {
 
                     pos = new BlockPos(pos.getX(), pos.getY(), pos.getZ());
 
-                    generateLabAt(sWorld, random, pos);
+                    generateHutAt(sWorld, random, pos);
 
                     for (int i = 0; i < 2; i++) {
                         spawnIllager(world, pos.getX() + 4, pos.getY() + 1, pos.getZ() + 4);
@@ -77,9 +79,16 @@ public class IllagerWoodHutGenerator implements IWorldGenerator {
 
     }
 
-    public static void generateLabAt(WorldServer world, Random random, BlockPos pos) {
+    public static void generateHutAt(WorldServer world, Random random, BlockPos pos) {
         MinecraftServer server = world.getMinecraftServer();
-        Template template = world.getStructureTemplateManager().getTemplate(server, WOODHUT);
+        Template template;
+
+        if(IllagerConfig.darkoak_theme){
+            template = world.getStructureTemplateManager().getTemplate(server, WOODHUT_DARKOAK);
+        }else {
+            template = world.getStructureTemplateManager().getTemplate(server, WOODHUT);
+        }
+
         PlacementSettings settings = new PlacementSettings();
 
         BlockPos size = template.getSize();
