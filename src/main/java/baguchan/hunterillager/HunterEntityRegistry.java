@@ -1,12 +1,18 @@
 package baguchan.hunterillager;
 
 import baguchan.hunterillager.entity.EntityHunterIllager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraft.entity.EntityClassification;
+import net.minecraft.entity.EntityType;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class HunterEntityRegistry {
-    public static void registerEntities() {
-        EntityRegistry.registerModEntity(new ResourceLocation(HunterIllagerCore.MODID, "hunter_illager"), EntityHunterIllager.class, prefix("HunterIllager"), 1, HunterIllagerCore.instance, 90, 3, false, 9804699, 0x582827);
+    public static final EntityType<?> HUNTERILLAGER = EntityType.Builder.create(EntityHunterIllager::new, EntityClassification.CREATURE).size(0.6F, 0.85F).build(HunterIllagerCore.MODID + ":hunterillager").setRegistryName(HunterIllagerCore.MODID + ":hunterillager");
+
+    @SubscribeEvent
+    public static void registerEntity(IForgeRegistry<EntityType<?>> event) {
+
+        event.register(HUNTERILLAGER);
 
     }
 
