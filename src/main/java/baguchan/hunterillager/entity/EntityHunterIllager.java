@@ -132,7 +132,7 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
             EnchantmentHelper.setEnchantments(map, itemstack);
             if(flag2){
                 Map<Enchantment, Integer> map2 = Maps.newHashMap();
-                map2.put(Enchantments.FLAME, i);
+                map2.put(Enchantments.FLAME, 1);
                 EnchantmentHelper.setEnchantments(map2, itemstack);
             }
         }
