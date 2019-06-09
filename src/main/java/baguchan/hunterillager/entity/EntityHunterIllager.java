@@ -26,7 +26,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.pathfinding.GroundPathNavigator;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtils;
@@ -49,6 +48,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 public class EntityHunterIllager extends AbstractIllagerEntity implements IRangedAttackMob {
     private static final UUID MODIFIER_UUID = UUID.fromString("5CD17E52-A79A-43D3-A529-90FDE04B181E");
@@ -59,14 +59,17 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
     /** If -1 there is no maximum distance */
     private float maximumHomeDistance = -1.0F;
 
+    public static final Predicate<LivingEntity> animalTarget = (p_213440_0_) -> {
+        EntityType<?> entitytype = p_213440_0_.getType();
+        return entitytype == EntityType.CHICKEN ||entitytype == EntityType.COW || entitytype == EntityType.PIG ||entitytype == EntityType.RABBIT || entitytype == EntityType.SNOW_GOLEM;
+    };
+
     protected int eattick = 0;
     private int cooldownTicks;
 
     public EntityHunterIllager(EntityType<EntityHunterIllager> type, World worldIn) {
         super(type, worldIn);
-        ((GroundPathNavigator) this.getNavigator()).setBreakDoors(true);
         this.experienceValue = 4;
-        this.setCanPickUpLoot(true);
         this.setDropChance(EquipmentSlotType.OFFHAND, 0.4F);
     }
 
@@ -77,21 +80,26 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
     {
         super.initEntityAI();
         this.field_70714_bg.addTask(0, new SwimGoal(this));
-        this.field_70714_bg.addTask(2, new RangedBowAttackGoal<>(this, 0.5D, 20, 15.0F));
-        this.field_70714_bg.addTask(4, new RandomWalkingGoal(this, 0.6D));
+        this.field_70714_bg.addTask(4, new RangedBowAttackGoal<>(this, 0.65D, 20, 15.0F));
+        this.field_70714_bg.addTask(6, new RandomWalkingGoal(this, 0.75D));
         this.field_70714_bg.addTask(9, new LookAtGoal(this, PlayerEntity.class, 3.0F, 1.0F));
         this.field_70714_bg.addTask(10, new LookAtGoal(this, MobEntity.class, 8.0F));
         this.field_70715_bh.addTask(1, (new HurtByTargetGoal(this, AbstractRaiderEntity.class)).func_220794_a());
         this.field_70715_bh.addTask(2, (new NearestAttackableTargetGoal<>(this, PlayerEntity.class, true)).setUnseenMemoryTicks(300));
         this.field_70715_bh.addTask(3, (new NearestAttackableTargetGoal<>(this, AbstractVillagerEntity.class, false)).setUnseenMemoryTicks(300));
         this.field_70715_bh.addTask(3, (new NearestAttackableTargetGoal<>(this, IronGolemEntity.class, false)).setUnseenMemoryTicks(300));
-        this.field_70715_bh.addTask(4, (new NearestAttackableTargetGoal<>(this, AnimalEntity.class, true)).setUnseenMemoryTicks(300));
+        this.field_70715_bh.addTask(4, (new NearestAttackableTargetGoal(this, AnimalEntity.class, 10, true,false,animalTarget){
+            @Override
+            public boolean shouldExecute() {
+                return super.shouldExecute() && !isCooldown();
+            }
+        }).setUnseenMemoryTicks(300));
     }
 
     @Override
     protected void registerAttributes() {
         super.registerAttributes();
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue((double)0.28F);
+        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue((double)0.3F);
         this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(22.0D);
         this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(26.0D);
         this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0D);
@@ -203,7 +211,7 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
                 if (this.potionUseTimer-- <= 0) {
                     this.setDrinkingPotion(false);
                     ItemStack itemstack = this.getHeldItemMainhand();
-                    this.setItemStackToSlot(EquipmentSlotType.MAINHAND, ItemStack.EMPTY);
+                    this.setItemStackToSlot(EquipmentSlotType.OFFHAND, ItemStack.EMPTY);
                     if (itemstack.getItem() == Items.POTION) {
                         List<EffectInstance> list = PotionUtils.getEffectsFromStack(itemstack);
                         if (list != null) {
@@ -215,12 +223,12 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
                 }
             } else {
                 Potion potion = null;
-                if (this.rand.nextFloat() < 0.005F && this.getHealth() < this.getMaxHealth()) {
+                if (this.rand.nextFloat() < 0.0046F && this.getHealth() < this.getMaxHealth()) {
                     potion = Potions.field_185250_v;
                 }
 
                 if (potion != null) {
-                    this.setItemStackToSlot(EquipmentSlotType.MAINHAND, PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), potion));
+                    this.setItemStackToSlot(EquipmentSlotType.OFFHAND, PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), potion));
                     this.potionUseTimer = this.getHeldItemMainhand().getUseDuration();
                     this.setDrinkingPotion(true);
                     this.world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_WITCH_DRINK, this.getSoundCategory(), 1.0F, 0.8F + this.rand.nextFloat() * 0.4F);
@@ -251,7 +259,7 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
     @Override
     protected SoundEvent getDeathSound()
     {
-        return SoundEvents.ENTITY_VILLAGER_DEATH;
+        return SoundEvents.ENTITY_VINDICATOR_DEATH;
     }
 
     @Override
@@ -268,7 +276,7 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
 
             this.playSound(HunterSounds.HUNTER_ILLAGER_LAUGH, this.getSoundVolume() + 0.15F, this.getSoundPitch());
 
-            this.setCooldownTicks(300);
+            this.setCooldownTicks(400);
         }
     }
 
