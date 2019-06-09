@@ -26,6 +26,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.pathfinding.GroundPathNavigator;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtils;
@@ -70,6 +71,7 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
     public EntityHunterIllager(EntityType<EntityHunterIllager> type, World worldIn) {
         super(type, worldIn);
         this.experienceValue = 4;
+        ((GroundPathNavigator)this.getNavigator()).setBreakDoors(true);
         this.setDropChance(EquipmentSlotType.OFFHAND, 0.4F);
     }
 
@@ -80,8 +82,9 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
     {
         super.initEntityAI();
         this.field_70714_bg.addTask(0, new SwimGoal(this));
+        this.field_70714_bg.addTask(2, new OpenDoorGoal(this,true));
         this.field_70714_bg.addTask(4, new RangedBowAttackGoal<>(this, 0.65D, 20, 15.0F));
-        this.field_70714_bg.addTask(6, new RandomWalkingGoal(this, 0.75D));
+        this.field_70714_bg.addTask(8, new RandomWalkingGoal(this, 0.75D));
         this.field_70714_bg.addTask(9, new LookAtGoal(this, PlayerEntity.class, 3.0F, 1.0F));
         this.field_70714_bg.addTask(10, new LookAtGoal(this, MobEntity.class, 8.0F));
         this.field_70715_bh.addTask(1, (new HurtByTargetGoal(this, AbstractRaiderEntity.class)).func_220794_a());
@@ -210,7 +213,7 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
             if (this.isDrinkingPotion()) {
                 if (this.potionUseTimer-- <= 0) {
                     this.setDrinkingPotion(false);
-                    ItemStack itemstack = this.getHeldItemMainhand();
+                    ItemStack itemstack = this.getHeldItemOffhand();
                     this.setItemStackToSlot(EquipmentSlotType.OFFHAND, ItemStack.EMPTY);
                     if (itemstack.getItem() == Items.POTION) {
                         List<EffectInstance> list = PotionUtils.getEffectsFromStack(itemstack);
@@ -229,7 +232,7 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
 
                 if (potion != null) {
                     this.setItemStackToSlot(EquipmentSlotType.OFFHAND, PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), potion));
-                    this.potionUseTimer = this.getHeldItemMainhand().getUseDuration();
+                    this.potionUseTimer = this.getHeldItemOffhand().getUseDuration();
                     this.setDrinkingPotion(true);
                     this.world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_WITCH_DRINK, this.getSoundCategory(), 1.0F, 0.8F + this.rand.nextFloat() * 0.4F);
                     IAttributeInstance iattributeinstance = this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
