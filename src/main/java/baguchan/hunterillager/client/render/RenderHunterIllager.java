@@ -21,9 +21,9 @@ public class RenderHunterIllager<T extends EntityHunterIllager> extends MobRende
         this.addLayer(new HeadLayer<>(this));
         this.addLayer(new CrossArmHeldItemLayer(this));
         this.addLayer(new HeldItemLayer<T, HunterIllagerModel<T>>(this) {
-            public void func_212842_a_(T p_212842_1_, float p_212842_2_, float p_212842_3_, float p_212842_4_, float p_212842_5_, float p_212842_6_, float p_212842_7_, float p_212842_8_) {
-                if ( p_212842_1_.func_213398_dR()) {
-                    super.func_212842_a_(p_212842_1_, p_212842_2_, p_212842_3_, p_212842_4_, p_212842_5_, p_212842_6_, p_212842_7_, p_212842_8_);
+            public void render(T p_212842_1_, float p_212842_2_, float p_212842_3_, float p_212842_4_, float p_212842_5_, float p_212842_6_, float p_212842_7_, float p_212842_8_) {
+                if ( p_212842_1_.isAggressive()) {
+                    super.render(p_212842_1_, p_212842_2_, p_212842_3_, p_212842_4_, p_212842_5_, p_212842_6_, p_212842_7_, p_212842_8_);
                 }
 
             }

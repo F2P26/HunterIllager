@@ -17,20 +17,20 @@ public class CrossArmHeldItemLayer<T extends EntityHunterIllager> extends LayerR
         super(p_i50916_1_);
     }
 
-    public void func_212842_a_(T p_212842_1_, float p_212842_2_, float p_212842_3_, float p_212842_4_, float p_212842_5_, float p_212842_6_, float p_212842_7_, float p_212842_8_) {
+    public void render(T p_212842_1_, float p_212842_2_, float p_212842_3_, float p_212842_4_, float p_212842_5_, float p_212842_6_, float p_212842_7_, float p_212842_8_) {
         ItemStack itemstack = p_212842_1_.getHeldItemOffhand();
-        if (!p_212842_1_.func_213398_dR()) {
+        if (!p_212842_1_.isAggressive()) {
             if (!itemstack.isEmpty()) {
                 GlStateManager.color3f(1.0F, 1.0F, 1.0F);
                 GlStateManager.pushMatrix();
-                if ((this.func_215332_c()).field_217114_e) {
+                if ((this.getEntityModel()).isSitting) {
                     GlStateManager.translatef(0.0F, 0.625F, 0.0F);
                     GlStateManager.rotatef(-20.0F, -1.0F, 0.0F, 0.0F);
                     float f = 0.5F;
                     GlStateManager.scalef(0.5F, 0.5F, 0.5F);
                 }
 
-                this.func_215332_c().crossHand.postRender(0.0625F);
+                this.getEntityModel().crossHand.postRender(0.0625F);
                 GlStateManager.translatef(-0.0625F, 0.53125F, 0.21875F);
                 Item item = itemstack.getItem();
                 if (Block.getBlockFromItem(item).getDefaultState().getRenderType() == BlockRenderType.ENTITYBLOCK_ANIMATED) {
