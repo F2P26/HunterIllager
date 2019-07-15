@@ -25,7 +25,7 @@ import java.util.Random;
 public class HunterHousePieces {
     private static final BlockPos STRUCTURE_OFFSET = new BlockPos(4, 0, 15);
 
-    private static final ResourceLocation[] sturcuture_resoucelocate = new ResourceLocation[]{new ResourceLocation(HunterIllagerCore.MODID,"illager_capmbase"), new ResourceLocation(HunterIllagerCore.MODID,"illager_woodhut")};
+    private static final ResourceLocation[] sturcuture_resoucelocate = new ResourceLocation[]{new ResourceLocation(HunterIllagerCore.MODID,"illager_campbase"), new ResourceLocation(HunterIllagerCore.MODID,"illager_woodhut")};
 
   /*  public static void func_204760_a(TemplateManager p_204760_0_, BlockPos p_204760_1_, Rotation p_204760_2_, List<StructurePiece> p_204760_3_, Random p_204760_4_) {
         ResourceLocation resourcelocation = sturcuture_resoucelocate[p_204760_4_.nextInt(sturcuture_resoucelocate.length)];
@@ -117,7 +117,7 @@ public class HunterHousePieces {
 
         private void func_204754_a(TemplateManager p_204754_1_) {
             Template template = p_204754_1_.getTemplateDefaulted(this.field_204756_e);
-            PlacementSettings placementsettings = (new PlacementSettings()).setRotation(this.rotation).setMirror(Mirror.NONE).setCenterOffset(HunterHousePieces.STRUCTURE_OFFSET).addProcessor(BlockIgnoreStructureProcessor.AIR_AND_STRUCTURE_BLOCK);
+            PlacementSettings placementsettings = (new PlacementSettings()).setRotation(this.rotation).setMirror(Mirror.NONE).setCenterOffset(HunterHousePieces.STRUCTURE_OFFSET).addProcessor(BlockIgnoreStructureProcessor.AIR_AND_STRUCTURE_BLOCK).setIgnoreEntities(false);
             this.setup(template, this.templatePosition, placementsettings);
         }
 
