@@ -353,6 +353,20 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
     }
 
     @Override
+    protected void dropInventory() {
+        super.dropInventory();
+        if (this.inventory != null) {
+            for(int i = 0; i < this.inventory.getSizeInventory(); ++i) {
+                ItemStack itemstack = this.inventory.getStackInSlot(i);
+                if (!itemstack.isEmpty()) {
+                    this.entityDropItem(itemstack);
+                }
+            }
+
+        }
+    }
+
+    @Override
     protected ResourceLocation getLootTable() {
         return new ResourceLocation(HunterIllagerCore.MODID, "entity/hunter_illager");
     }

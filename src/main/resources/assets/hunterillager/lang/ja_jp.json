@@ -1,6 +1,5 @@
 {
-  "item.japaricraftmod.spawnegg_hunterillager": "邪悪なハンターのスポーンエッグ",
+  "item.hunterillager.spawnegg_hunterillager": "邪悪なハンターのスポーンエッグ",
   "entity.hunterillager.hunterillager": "邪悪なハンター",
-
   "hunterillager:subtitles.hunterillager.laugh": "邪悪なハンターが笑う"
 }
