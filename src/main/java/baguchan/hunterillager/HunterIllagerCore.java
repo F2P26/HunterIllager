@@ -8,8 +8,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
-import net.minecraftforge.common.BiomeDictionary;
+import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,13 +16,11 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 
-import java.util.Set;
-
 @Mod("hunterillager")
-public class HunterIllagerCore
-{
+public class HunterIllagerCore {
     public static final String MODID = "hunterillager";
     public static HunterIllagerCore instance;
 
@@ -40,19 +37,15 @@ public class HunterIllagerCore
     }
 
 
-
     private void setup(final FMLCommonSetupEvent event) {
         MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
-
-        for (Biome biome : Biome.BIOMES) {
-
-
-            Set<BiomeDictionary.Type> types = BiomeDictionary.getTypes(biome);
-            if (types.contains(BiomeDictionary.Type.FOREST)) {
-                biome.addStructure(FeatureRegister.HUNTER_HOUSE, new NoFeatureConfig());
+        ForgeRegistries.BIOMES.getValues().stream().forEach((biome -> {
+            if (biome.getCategory() == Biome.Category.FOREST) {
+                biome.addStructure(FeatureRegister.HUNTER_HOUSE, IFeatureConfig.NO_FEATURE_CONFIG);
             }
-        }
+        }));
     }
+
 
     private void clientSetup(final FMLClientSetupEvent event) {
         HunterRenderingRegistry.registerRenderers();

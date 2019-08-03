@@ -15,8 +15,6 @@ public class HunterItems {
 
 
     public static void register(IForgeRegistry<Item> registry, Item item, String id) {
-
-
         item.setRegistryName(new ResourceLocation(HunterIllagerCore.MODID, id));
         registry.register(item);
     }
