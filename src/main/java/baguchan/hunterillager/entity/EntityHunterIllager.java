@@ -16,7 +16,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.RandomPositionGenerator;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.ai.goal.Goal;
@@ -461,15 +460,9 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
 
     private class FindCampfireOrBed extends Goal {
         protected final EntityHunterIllager creature;
-        protected final double speed;
-        protected double randPosX;
-        protected double randPosY;
-        protected double randPosZ;
 
         public FindCampfireOrBed(EntityHunterIllager creature, double speedIn) {
             this.creature = creature;
-            this.speed = speedIn;
-            this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
         }
 
         /**
@@ -479,35 +472,18 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
             if (this.creature.getMainHome() != null || this.creature.getAttackTarget() != null || isRaidActive()) {
                 return false;
             } else {
-                return this.findRandomPosition();
-            }
-        }
-
-        protected boolean findRandomPosition() {
-            Vec3d vec3d = RandomPositionGenerator.findRandomTarget(this.creature, 10, 10);
-            if (vec3d == null) {
-                return false;
-            } else {
-                this.randPosX = vec3d.x;
-                this.randPosY = vec3d.y;
-                this.randPosZ = vec3d.z;
                 return true;
             }
         }
 
-        /**
-         * Execute a one shot task or start executing a continuous task
-         */
-        public void startExecuting() {
-            this.creature.getNavigator().tryMoveToXYZ(this.randPosX, this.randPosY, this.randPosZ, this.speed);
-        }
+
 
         @Override
         public void tick() {
             super.tick();
 
-            if (this.creature.ticksExisted % 300 == 0) {
-                int range = 20;
+            if (this.creature.ticksExisted % 120 == 0) {
+                int range = 15;
                 for (int x = -range; x <= range; x++) {
                     for (int y = -range / 2; y <= range / 2; y++) {
                         for (int z = -range; z <= range; z++) {
