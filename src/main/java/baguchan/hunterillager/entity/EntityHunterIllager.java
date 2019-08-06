@@ -3,13 +3,30 @@ package baguchan.hunterillager.entity;
 import baguchan.hunterillager.HunterIllagerCore;
 import baguchan.hunterillager.HunterSounds;
 import com.google.common.collect.Maps;
+import net.minecraft.block.BedBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.*;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ILivingEntityData;
+import net.minecraft.entity.IRangedAttackMob;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.RandomPositionGenerator;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.HurtByTargetGoal;
+import net.minecraft.entity.ai.goal.LookAtGoal;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
+import net.minecraft.entity.ai.goal.OpenDoorGoal;
+import net.minecraft.entity.ai.goal.RandomWalkingGoal;
+import net.minecraft.entity.ai.goal.RangedBowAttackGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.merchant.villager.AbstractVillagerEntity;
 import net.minecraft.entity.monster.AbstractIllagerEntity;
@@ -26,6 +43,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -36,6 +54,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IWorld;
@@ -45,6 +64,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -54,11 +74,9 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
     private static final AttributeModifier MODIFIER = (new AttributeModifier(MODIFIER_UUID, "Drinking speed penalty", -0.25D, AttributeModifier.Operation.ADDITION)).setSaved(false);
     private static final DataParameter<Boolean> IS_EATING = EntityDataManager.createKey(EntityHunterIllager.class, DataSerializers.BOOLEAN);
     private int foodUseTimer;
-    private BlockPos homePosition = BlockPos.ZERO;
-    /**
-     * If -1 there is no maximum distance
-     */
-    private float maximumHomeDistance = -1.0F;
+    @Nullable
+    private BlockPos homePosition;
+
     private final Inventory inventory = new Inventory(5);
 
     public static final Predicate<LivingEntity> animalTarget = (p_213440_0_) -> {
@@ -71,9 +89,10 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
 
     public EntityHunterIllager(EntityType<EntityHunterIllager> type, World worldIn) {
         super(type, worldIn);
-        this.experienceValue = 4;
+        this.experienceValue = 6;
         ((GroundPathNavigator) this.getNavigator()).setBreakDoors(true);
         this.setDropChance(EquipmentSlotType.OFFHAND, 0.4F);
+        this.inventory.addItem(new ItemStack(Items.COOKED_PORKCHOP, 4));
     }
 
 
@@ -83,6 +102,8 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
         this.goalSelector.addGoal(0, new SwimGoal(this));
         this.goalSelector.addGoal(2, new OpenDoorGoal(this, true));
         this.goalSelector.addGoal(4, new RangedBowAttackGoal<>(this, 0.65D, 20, 15.0F));
+        this.goalSelector.addGoal(6, new MoveToGoal(this, 8.0D, 0.8D));
+        this.goalSelector.addGoal(7, new FindCampfireOrBed(this, 0.8D));
         this.goalSelector.addGoal(8, new RandomWalkingGoal(this, 0.75D));
         this.goalSelector.addGoal(9, new LookAtGoal(this, PlayerEntity.class, 3.0F, 1.0F));
         this.goalSelector.addGoal(10, new LookAtGoal(this, MobEntity.class, 8.0F));
@@ -168,9 +189,9 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
 
         compound.putInt("CooldownTicks", this.cooldownTicks);
 
-        compound.putInt("HomePosX", homePosition.getX());
-        compound.putInt("HomePosY", homePosition.getY());
-        compound.putInt("HomePosZ", homePosition.getZ());
+        if (this.homePosition != null) {
+            compound.put("HomeTarget", NBTUtil.writeBlockPos(this.homePosition));
+        }
 
         ListNBT listnbt = new ListNBT();
 
@@ -193,7 +214,9 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
 
         this.cooldownTicks = compound.getInt("CooldownTicks");
 
-        homePosition = new BlockPos(compound.getInt("HomePosX"), compound.getInt("HomePosY"), compound.getInt("HomePosZ"));
+        if (compound.contains("HomeTarget")) {
+            this.homePosition = NBTUtil.readBlockPos(compound.getCompound("HomeTarget"));
+        }
 
         ListNBT listnbt = compound.getList("Inventory", 10);
 
@@ -232,19 +255,15 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
     }
 
 
-    /**
-     * Sets home position and max distance for it
-     */
-    public void setMaximumHomeDistance(BlockPos pos, int distance) {
-        this.homePosition = pos;
-        this.maximumHomeDistance = (float) distance;
+    public void setMainHome(@Nullable BlockPos p_213726_1_) {
+        this.homePosition = p_213726_1_;
     }
 
 
-    public BlockPos getHomePosition() {
+    @Nullable
+    public BlockPos getMainHome() {
         return this.homePosition;
     }
-
 
     public boolean isCooldown() {
         return this.cooldownTicks > 0;
@@ -389,6 +408,138 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
     @OnlyIn(Dist.CLIENT)
     public AbstractIllagerEntity.ArmPose getArmPose() {
         return this.isAggressive() ? AbstractIllagerEntity.ArmPose.BOW_AND_ARROW : AbstractIllagerEntity.ArmPose.CROSSED;
+    }
+
+    class MoveToGoal extends Goal {
+        final EntityHunterIllager hunterIllager;
+        final double field_220848_b;
+        final double speed;
+
+        MoveToGoal(EntityHunterIllager hunterillager, double distance, double speed) {
+            this.hunterIllager = hunterillager;
+            this.field_220848_b = distance;
+            this.speed = speed;
+            this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
+        }
+
+        /**
+         * Reset the task's internal state. Called when this task is interrupted by another one
+         */
+        public void resetTask() {
+            EntityHunterIllager.this.navigator.clearPath();
+        }
+
+        /**
+         * Returns whether the EntityAIBase should begin execution.
+         */
+        public boolean shouldExecute() {
+            BlockPos blockpos = this.hunterIllager.getMainHome();
+            return blockpos != null && this.func_220846_a(blockpos, this.field_220848_b) && !isRaidActive();
+        }
+
+        /**
+         * Keep ticking a continuous task that has already been started
+         */
+        public void tick() {
+            BlockPos blockpos = this.hunterIllager.getMainHome();
+            if (blockpos != null && EntityHunterIllager.this.navigator.noPath()) {
+                if (this.func_220846_a(blockpos, 10.0D)) {
+                    Vec3d vec3d = (new Vec3d((double) blockpos.getX() - this.hunterIllager.posX, (double) blockpos.getY() - this.hunterIllager.posY, (double) blockpos.getZ() - this.hunterIllager.posZ)).normalize();
+                    Vec3d vec3d1 = vec3d.scale(10.0D).add(this.hunterIllager.posX, this.hunterIllager.posY, this.hunterIllager.posZ);
+                    EntityHunterIllager.this.navigator.tryMoveToXYZ(vec3d1.x, vec3d1.y, vec3d1.z, this.speed);
+                } else {
+                    EntityHunterIllager.this.navigator.tryMoveToXYZ((double) blockpos.getX(), (double) blockpos.getY(), (double) blockpos.getZ(), this.speed);
+                }
+            }
+
+        }
+
+        private boolean func_220846_a(BlockPos p_220846_1_, double p_220846_2_) {
+            return !p_220846_1_.withinDistance(this.hunterIllager.getPositionVec(), p_220846_2_);
+        }
+    }
+
+    private class FindCampfireOrBed extends Goal {
+        protected final EntityHunterIllager creature;
+        protected final double speed;
+        protected double randPosX;
+        protected double randPosY;
+        protected double randPosZ;
+
+        public FindCampfireOrBed(EntityHunterIllager creature, double speedIn) {
+            this.creature = creature;
+            this.speed = speedIn;
+            this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
+        }
+
+        /**
+         * Returns whether the EntityAIBase should begin execution.
+         */
+        public boolean shouldExecute() {
+            if (this.creature.getMainHome() != null || this.creature.getAttackTarget() != null || isRaidActive()) {
+                return false;
+            } else {
+                return this.findRandomPosition();
+            }
+        }
+
+        protected boolean findRandomPosition() {
+            Vec3d vec3d = RandomPositionGenerator.findRandomTarget(this.creature, 10, 10);
+            if (vec3d == null) {
+                return false;
+            } else {
+                this.randPosX = vec3d.x;
+                this.randPosY = vec3d.y;
+                this.randPosZ = vec3d.z;
+                return true;
+            }
+        }
+
+        /**
+         * Execute a one shot task or start executing a continuous task
+         */
+        public void startExecuting() {
+            this.creature.getNavigator().tryMoveToXYZ(this.randPosX, this.randPosY, this.randPosZ, this.speed);
+        }
+
+        @Override
+        public void tick() {
+            super.tick();
+
+            if (this.creature.ticksExisted % 300 == 0) {
+                int range = 20;
+                for (int x = -range; x <= range; x++) {
+                    for (int y = -range / 2; y <= range / 2; y++) {
+                        for (int z = -range; z <= range; z++) {
+                            BlockPos pos = this.creature.getPosition().add(x, y, z);
+
+                            BlockState state = world.getBlockState(pos);
+
+                            if (state.getBlock() == Blocks.CAMPFIRE) {
+                                this.creature.setMainHome(pos);
+
+                                return;
+
+                            } else if (state.getBlock() instanceof BedBlock) {
+                                this.creature.setMainHome(pos);
+
+                                return;
+                            }
+
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+        /**
+         * Returns whether an in-progress EntityAIBase should continue executing
+         */
+        public boolean shouldContinueExecuting() {
+            return !this.creature.getNavigator().noPath();
+        }
 
     }
 }

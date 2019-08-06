@@ -7,10 +7,14 @@ import baguchan.hunterillager.structure.FeatureRegister;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.world.gen.placement.IPlacementConfig;
+import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -34,18 +38,26 @@ public class HunterIllagerCore {
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, this::onItemsRegistry);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(EntityType.class, this::onEntityRegistry);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Feature.class, this::onFeatureRegistry);
+	    FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Biome.class, this::onBiomeRegistry);
     }
 
 
     private void setup(final FMLCommonSetupEvent event) {
         MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
-        ForgeRegistries.BIOMES.getValues().stream().forEach((biome -> {
-            if (biome.getCategory() == Biome.Category.FOREST) {
-                biome.addStructure(FeatureRegister.HUNTER_HOUSE, IFeatureConfig.NO_FEATURE_CONFIG);
-            }
-        }));
+
+
+	    for (Biome biome : ForgeRegistries.BIOMES) {
+		    biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(FeatureRegister.HUNTER_HOUSE, IFeatureConfig.NO_FEATURE_CONFIG, Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
+		    biome.addStructure(FeatureRegister.HUNTER_HOUSE, IFeatureConfig.NO_FEATURE_CONFIG);
+
+	    }
     }
 
+
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onBiomeRegistry(RegistryEvent.Register<Biome> event) {
+
+	}
 
     private void clientSetup(final FMLClientSetupEvent event) {
         HunterRenderingRegistry.registerRenderers();

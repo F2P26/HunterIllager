@@ -1,8 +1,6 @@
 package baguchan.hunterillager.structure;
 
 import baguchan.hunterillager.HunterIllagerCore;
-import com.google.common.collect.ImmutableList;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
@@ -11,9 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.feature.jigsaw.JigsawManager;
-import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
 import net.minecraft.world.gen.feature.jigsaw.JigsawPiece;
-import net.minecraft.world.gen.feature.jigsaw.SingleJigsawPiece;
 import net.minecraft.world.gen.feature.structure.AbstractVillagePiece;
 import net.minecraft.world.gen.feature.structure.StructurePiece;
 import net.minecraft.world.gen.feature.template.TemplateManager;
@@ -25,10 +21,6 @@ public class HunterHousePieces {
         JigsawManager.func_214889_a(new ResourceLocation(HunterIllagerCore.MODID,"illager_campbase"), 7, HunterHousePieces.HunterHouse::new, p_215139_0_, templateManagerIn, p_215139_2_, p_215139_3_, p_215139_4_);
     }
 
-    static {
-        JigsawManager.field_214891_a.register(new JigsawPattern(new ResourceLocation(HunterIllagerCore.MODID,"illager_campbase"), new ResourceLocation("empty"), ImmutableList.of(Pair.of(new SingleJigsawPiece(HunterIllagerCore.MODID+ ":" +"illager_campbase"), 1)), JigsawPattern.PlacementBehaviour.RIGID));
-        JigsawManager.field_214891_a.register(new JigsawPattern(new ResourceLocation(HunterIllagerCore.MODID,"illager_woodhut"), new ResourceLocation("empty"), ImmutableList.of(Pair.of(new SingleJigsawPiece(HunterIllagerCore.MODID+ ":" +"illager_woodhut"), 1)), JigsawPattern.PlacementBehaviour.RIGID));
-    }
 
     public static class HunterHouse extends AbstractVillagePiece {
         public HunterHouse(TemplateManager p_i50560_1_, JigsawPiece p_i50560_2_, BlockPos p_i50560_3_, int p_i50560_4_, Rotation p_i50560_5_, MutableBoundingBox p_i50560_6_) {

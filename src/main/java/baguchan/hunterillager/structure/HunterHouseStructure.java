@@ -67,7 +67,6 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
         return 3;
     }
 
-
     public Structure.IStartFactory getStartFactory() {
         return HunterHouseStructure.Start::new;
     }
