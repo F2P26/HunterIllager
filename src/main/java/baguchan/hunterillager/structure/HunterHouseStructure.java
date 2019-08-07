@@ -1,6 +1,7 @@
 package baguchan.hunterillager.structure;
 
 import com.mojang.datafixers.Dynamic;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -76,7 +77,7 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
     }
 
     protected int getBiomeFeatureDistance(ChunkGenerator<?> chunkGenerator) {
-        return 16;
+        return 20;
     }
 
     protected int getBiomeFeatureSeparation(ChunkGenerator<?> chunkGenerator) {
@@ -90,7 +91,9 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
 
         public void init(ChunkGenerator<?> generator, TemplateManager templateManagerIn, int chunkX, int chunkZ, Biome biomeIn) {
             BlockPos blockpos = new BlockPos(chunkX * 16, 90, chunkZ * 16);
-            HunterHousePieces.addStructure(generator,templateManagerIn, blockpos,this.components, this.rand);
+
+            Rotation rotation = Rotation.values()[this.rand.nextInt(Rotation.values().length)];
+            HunterHousePieces.addStructure(templateManagerIn, blockpos, rotation, this.components, this.rand);
             this.recalculateStructureSize();
         }
     }

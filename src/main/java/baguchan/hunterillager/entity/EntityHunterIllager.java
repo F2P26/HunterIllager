@@ -3,9 +3,6 @@ package baguchan.hunterillager.entity;
 import baguchan.hunterillager.HunterIllagerCore;
 import baguchan.hunterillager.HunterSounds;
 import com.google.common.collect.Maps;
-import net.minecraft.block.BedBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -91,7 +88,6 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
         this.experienceValue = 6;
         ((GroundPathNavigator) this.getNavigator()).setBreakDoors(true);
         this.setDropChance(EquipmentSlotType.OFFHAND, 0.4F);
-        this.inventory.addItem(new ItemStack(Items.COOKED_PORKCHOP, 4));
     }
 
 
@@ -102,7 +98,6 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
         this.goalSelector.addGoal(2, new OpenDoorGoal(this, true));
         this.goalSelector.addGoal(4, new RangedBowAttackGoal<>(this, 0.65D, 20, 15.0F));
         this.goalSelector.addGoal(6, new MoveToGoal(this, 8.0D, 0.8D));
-        this.goalSelector.addGoal(7, new FindCampfireOrBed(this, 0.8D));
         this.goalSelector.addGoal(8, new RandomWalkingGoal(this, 0.75D));
         this.goalSelector.addGoal(9, new LookAtGoal(this, PlayerEntity.class, 3.0F, 1.0F));
         this.goalSelector.addGoal(10, new LookAtGoal(this, MobEntity.class, 8.0F));
@@ -186,11 +181,11 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
     public void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
 
-        compound.putInt("CooldownTicks", this.cooldownTicks);
-
         if (this.homePosition != null) {
             compound.put("HomeTarget", NBTUtil.writeBlockPos(this.homePosition));
         }
+
+        compound.putInt("CooldownTicks", this.cooldownTicks);
 
         ListNBT listnbt = new ListNBT();
 
@@ -211,11 +206,11 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
     public void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
 
-        this.cooldownTicks = compound.getInt("CooldownTicks");
-
         if (compound.contains("HomeTarget")) {
             this.homePosition = NBTUtil.readBlockPos(compound.getCompound("HomeTarget"));
         }
+
+        this.cooldownTicks = compound.getInt("CooldownTicks");
 
         ListNBT listnbt = compound.getList("Inventory", 10);
 
@@ -456,66 +451,5 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
         private boolean func_220846_a(BlockPos p_220846_1_, double p_220846_2_) {
             return !p_220846_1_.withinDistance(this.hunterIllager.getPositionVec(), p_220846_2_);
         }
-    }
-
-    private class FindCampfireOrBed extends Goal {
-        protected final EntityHunterIllager creature;
-
-        public FindCampfireOrBed(EntityHunterIllager creature, double speedIn) {
-            this.creature = creature;
-        }
-
-        /**
-         * Returns whether the EntityAIBase should begin execution.
-         */
-        public boolean shouldExecute() {
-            if (this.creature.getMainHome() != null || this.creature.getAttackTarget() != null || isRaidActive()) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-
-
-
-        @Override
-        public void tick() {
-            super.tick();
-
-            if (this.creature.ticksExisted % 120 == 0) {
-                int range = 15;
-                for (int x = -range; x <= range; x++) {
-                    for (int y = -range / 2; y <= range / 2; y++) {
-                        for (int z = -range; z <= range; z++) {
-                            BlockPos pos = this.creature.getPosition().add(x, y, z);
-
-                            BlockState state = world.getBlockState(pos);
-
-                            if (state.getBlock() == Blocks.CAMPFIRE) {
-                                this.creature.setMainHome(pos);
-
-                                return;
-
-                            } else if (state.getBlock() instanceof BedBlock) {
-                                this.creature.setMainHome(pos);
-
-                                return;
-                            }
-
-                        }
-
-                    }
-
-                }
-            }
-        }
-
-        /**
-         * Returns whether an in-progress EntityAIBase should continue executing
-         */
-        public boolean shouldContinueExecuting() {
-            return !this.creature.getNavigator().noPath();
-        }
-
     }
 }
