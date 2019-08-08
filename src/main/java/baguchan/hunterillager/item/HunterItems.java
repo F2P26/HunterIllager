@@ -13,7 +13,6 @@ public class HunterItems {
     public static final Item SPAWNEGG_HUNTERILLAGER = new SpawnEggItem(HunterEntityRegistry.HUNTERILLAGER,  9804699, 0x582827, new Item.Properties().group(ItemGroup.MISC));
 
 
-
     public static void register(IForgeRegistry<Item> registry, Item item, String id) {
         item.setRegistryName(new ResourceLocation(HunterIllagerCore.MODID, id));
         registry.register(item);

@@ -163,15 +163,20 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
 
         boolean flag = this.rand.nextFloat() <= raid.func_221308_w();
         boolean flag2 = this.rand.nextFloat() <= 0.25;
+	    boolean flag3 = this.rand.nextFloat() <= 0.15;
         if (flag) {
             Map<Enchantment, Integer> map = Maps.newHashMap();
             map.put(Enchantments.POWER, i);
             EnchantmentHelper.setEnchantments(map, itemstack);
             if (flag2) {
                 Map<Enchantment, Integer> map2 = Maps.newHashMap();
-                map2.put(Enchantments.FLAME, 1);
+		    map2.put(Enchantments.KNOCKBACK, 1);
                 EnchantmentHelper.setEnchantments(map2, itemstack);
             }
+		if (flag3) {
+			this.inventory.addItem(new ItemStack(Items.GOLDEN_APPLE, 1));
+		}
+
         }
 
         this.setItemStackToSlot(EquipmentSlotType.MAINHAND, itemstack);
@@ -293,7 +298,7 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
                             this.setItemStackToSlot(EquipmentSlotType.OFFHAND, itemstack1);
                         }
                     }
-                }else if(this.foodUseTimer>=0 && this.rand.nextFloat() < 0.1F){
+		} else if (this.foodUseTimer >= 0 && this.eattick % 4 == 0) {
                     this.world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_GENERIC_EAT, this.getSoundCategory(), 1.0F, 0.8F + this.rand.nextFloat() * 0.4F);
                 }
             } else {
@@ -387,14 +392,14 @@ public class EntityHunterIllager extends AbstractIllagerEntity implements IRange
     @Override
     public void attackEntityWithRangedAttack(LivingEntity target, float distanceFactor) {
         ItemStack itemstack = this.findAmmo(this.getHeldItem(ProjectileHelper.getHandWith(this, Items.BOW)));
-        AbstractArrowEntity abstractarrowentity = ProjectileHelper.func_221272_a(this, itemstack, distanceFactor);
+	    AbstractArrowEntity abstractarrowentity = ProjectileHelper.func_221272_a(this, itemstack, distanceFactor * 1.15F);
         if (this.getHeldItemMainhand().getItem() instanceof net.minecraft.item.BowItem)
             abstractarrowentity = ((net.minecraft.item.BowItem) this.getHeldItemMainhand().getItem()).customeArrow(abstractarrowentity);
         double d0 = target.posX - this.posX;
         double d1 = target.getBoundingBox().minY + (double) (target.getHeight() / 3.0F) - abstractarrowentity.posY;
         double d2 = target.posZ - this.posZ;
         double d3 = (double) MathHelper.sqrt(d0 * d0 + d2 * d2);
-        abstractarrowentity.shoot(d0, d1 + d3 * (double) 0.2F, d2, 1.6F, (float) (14 - this.world.getDifficulty().getId() * 4));
+	    abstractarrowentity.shoot(d0, d1 + d3 * (double) 0.2F, d2, 1.6F, (float) (10 - this.world.getDifficulty().getId() * 4));
         this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRNG().nextFloat() * 0.4F + 0.8F));
         world.addEntity(abstractarrowentity);
     }

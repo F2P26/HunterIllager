@@ -1,5 +1,8 @@
 {
   "item.hunterillager.spawnegg_hunterillager": "邪悪なハンターのスポーンエッグ",
+  "item.hunterillager.quivers": "大きめの矢筒",
+  "container.hunterillager.quivers": "大きめの矢筒",
+
   "entity.hunterillager.hunterillager": "邪悪なハンター",
   "hunterillager:subtitles.hunterillager.laugh": "邪悪なハンターが笑う"
 }

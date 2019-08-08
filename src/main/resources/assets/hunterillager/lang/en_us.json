@@ -1,5 +1,8 @@
 {
   "item.hunterillager.spawnegg_hunterillager": "SpawnEgg HunterIllager",
+  "item.hunterillager.quivers": "Quivers",
+  "container.hunterillager.quivers": "Quivers",
+
   "entity.hunterillager.hunterillager": "HunterIllager",
   "hunterillager:subtitles.hunterillager.laugh": "Hunter Illager laughs"
 }

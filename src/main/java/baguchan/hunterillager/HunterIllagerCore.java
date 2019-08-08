@@ -14,7 +14,6 @@ import net.minecraft.world.gen.placement.IPlacementConfig;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -32,13 +31,11 @@ public class HunterIllagerCore {
         instance = this;
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
 
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, this::onItemsRegistry);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(EntityType.class, this::onEntityRegistry);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Feature.class, this::onFeatureRegistry);
-	    FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Biome.class, this::onBiomeRegistry);
     }
 
 
@@ -52,12 +49,6 @@ public class HunterIllagerCore {
             }
         }
     }
-
-
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public void onBiomeRegistry(RegistryEvent.Register<Biome> event) {
-
-	}
 
     private void clientSetup(final FMLClientSetupEvent event) {
         HunterRenderingRegistry.registerRenderers();
