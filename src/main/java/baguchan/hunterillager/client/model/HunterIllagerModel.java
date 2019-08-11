@@ -1,6 +1,6 @@
 package baguchan.hunterillager.client.model;
 
-import baguchan.hunterillager.entity.EntityHunterIllager;
+import baguchan.hunterillager.entity.HunterIllagerEntity;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.IHasArm;
 import net.minecraft.client.renderer.entity.model.IHasHead;
@@ -13,7 +13,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class HunterIllagerModel <T extends EntityHunterIllager> extends EntityModel<T> implements IHasArm, IHasHead {
+public class HunterIllagerModel<T extends HunterIllagerEntity> extends EntityModel<T> implements IHasArm, IHasHead {
     public RendererModel head;
     public RendererModel rightHand;
     public RendererModel rightLeg;

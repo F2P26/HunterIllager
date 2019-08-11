@@ -2,7 +2,7 @@ package baguchan.hunterillager.structure;
 
 import baguchan.hunterillager.HunterEntityRegistry;
 import baguchan.hunterillager.HunterIllagerCore;
-import baguchan.hunterillager.entity.EntityHunterIllager;
+import baguchan.hunterillager.entity.HunterIllagerEntity;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.ILivingEntityData;
@@ -80,7 +80,7 @@ public class HunterHousePieces {
         protected void handleDataMarker(String function, BlockPos pos, IWorld worldIn, Random rand, MutableBoundingBox sbb) {
             if ("hunter".equals(function)) {
                 worldIn.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
-                EntityHunterIllager hunterIllager = HunterEntityRegistry.HUNTERILLAGER.create(worldIn.getWorld());
+                HunterIllagerEntity hunterIllager = HunterEntityRegistry.HUNTERILLAGER.create(worldIn.getWorld());
                 hunterIllager.setPosition((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D);
                 hunterIllager.enablePersistence();
                 hunterIllager.setMainHome(pos);

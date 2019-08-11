@@ -1,7 +1,7 @@
 package baguchan.hunterillager.client.render.layer;
 
 import baguchan.hunterillager.client.model.HunterIllagerModel;
-import baguchan.hunterillager.entity.EntityHunterIllager;
+import baguchan.hunterillager.entity.HunterIllagerEntity;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-public class CrossArmHeldItemLayer<T extends EntityHunterIllager> extends LayerRenderer<T, HunterIllagerModel<T>> {
+public class CrossArmHeldItemLayer<T extends HunterIllagerEntity> extends LayerRenderer<T, HunterIllagerModel<T>> {
     public CrossArmHeldItemLayer(IEntityRenderer<T, HunterIllagerModel<T>> p_i50916_1_) {
         super(p_i50916_1_);
     }

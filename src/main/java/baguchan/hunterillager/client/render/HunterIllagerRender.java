@@ -3,7 +3,7 @@ package baguchan.hunterillager.client.render;
 import baguchan.hunterillager.HunterIllagerCore;
 import baguchan.hunterillager.client.model.HunterIllagerModel;
 import baguchan.hunterillager.client.render.layer.CrossArmHeldItemLayer;
-import baguchan.hunterillager.entity.EntityHunterIllager;
+import baguchan.hunterillager.entity.HunterIllagerEntity;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.layers.HeadLayer;
@@ -13,10 +13,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderHunterIllager<T extends EntityHunterIllager> extends MobRenderer<T, HunterIllagerModel<T>> {
+public class HunterIllagerRender<T extends HunterIllagerEntity> extends MobRenderer<T, HunterIllagerModel<T>> {
     private static final ResourceLocation ILLAGER = new ResourceLocation(HunterIllagerCore.MODID, "textures/entity/illager/hunter_illager.png");
 
-    public RenderHunterIllager(EntityRendererManager p_i47477_1_) {
+    public HunterIllagerRender(EntityRendererManager p_i47477_1_) {
         super(p_i47477_1_, new HunterIllagerModel<>(), 0.5F);
         this.addLayer(new HeadLayer<>(this));
         this.addLayer(new CrossArmHeldItemLayer(this));
@@ -33,7 +33,7 @@ public class RenderHunterIllager<T extends EntityHunterIllager> extends MobRende
     /**
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
-    protected ResourceLocation getEntityTexture(EntityHunterIllager entity) {
+    protected ResourceLocation getEntityTexture(HunterIllagerEntity entity) {
         return ILLAGER;
     }
 }
