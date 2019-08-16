@@ -87,7 +87,7 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
     }
 
     protected int getBiomeFeatureSeparation(ChunkGenerator<?> chunkGenerator) {
-        return 8;
+        return 6;
     }
 
     public static class Start extends StructureStart {
