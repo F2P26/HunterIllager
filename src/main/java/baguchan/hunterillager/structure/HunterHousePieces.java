@@ -4,6 +4,7 @@ import baguchan.hunterillager.HunterEntityRegistry;
 import baguchan.hunterillager.HunterIllagerCore;
 import baguchan.hunterillager.entity.HunterIllagerEntity;
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.ILivingEntityData;
 import net.minecraft.entity.SpawnReason;
@@ -32,7 +33,7 @@ public class HunterHousePieces {
 
     private static final ResourceLocation woodhutTemplate = new ResourceLocation(HunterIllagerCore.MODID, "illager_woodhut");
 
-    private static final Map<ResourceLocation, BlockPos> structurePos = ImmutableMap.of(campbaseTemplate, BlockPos.ZERO, woodhutTemplate, new BlockPos(5, -1, 0));
+    private static final Map<ResourceLocation, BlockPos> structurePos = ImmutableMap.of(campbaseTemplate, BlockPos.ZERO, woodhutTemplate, new BlockPos(8, 0, 0));
 
     public static void addStructure(TemplateManager p_207617_0_, BlockPos p_207617_1_, Rotation p_207617_2_, List<StructurePiece> p_207617_3_, Random p_207617_4_) {
         if (p_207617_4_.nextDouble() < 0.5D) {
@@ -101,6 +102,15 @@ public class HunterHousePieces {
             BlockPos blockpos2 = this.templatePosition;
             this.templatePosition = this.templatePosition.add(0, i - 90 - 1, 0);
             boolean flag = super.addComponentParts(worldIn, randomIn, structureBoundingBoxIn, p_74875_4_);
+
+            if (this.field_207615_d.equals(HunterHousePieces.woodhutTemplate)) {
+                BlockPos blockpos3 = this.templatePosition.add(Template.transformedBlockPos(placementsettings, new BlockPos(7, 0, 8)));
+                BlockState blockstate = worldIn.getBlockState(blockpos3.down());
+                if (!blockstate.isAir()) {
+                    worldIn.setBlockState(blockpos3, Blocks.DIRT.getDefaultState(), 3);
+                }
+            }
+
 
             this.templatePosition = blockpos2;
             return flag;

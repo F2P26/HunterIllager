@@ -1,17 +1,21 @@
 package baguchan.hunterillager.structure;
 
 import com.mojang.datafixers.Dynamic;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.OverworldGenSettings;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
-import net.minecraft.world.gen.feature.structure.MarginedStructureStart;
 import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.gen.feature.structure.StructurePiece;
+import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 
 import java.util.Random;
@@ -41,18 +45,20 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
 
     public boolean hasStartAt(ChunkGenerator<?> chunkGen, Random rand, int chunkPosX, int chunkPosZ) {
         ChunkPos chunkpos = this.getStartPositionForPosition(chunkGen, rand, chunkPosX, chunkPosZ, 0, 0);
-        if (chunkPosX == chunkpos.x && chunkPosZ == chunkpos.z) {
-            Biome biome = chunkGen.getBiomeProvider().getBiome(new BlockPos(chunkPosX * 16 + 9, 0, chunkPosZ * 16 + 9));
-            if (chunkGen.hasStructure(biome, FeatureRegister.HUNTER_HOUSE)) {
-                for (int k = chunkPosX - 10; k <= chunkPosX + 10; ++k) {
-                    for (int l = chunkPosZ - 10; l <= chunkPosZ + 10; ++l) {
-                        if (Feature.VILLAGE.hasStartAt(chunkGen, rand, k, l)) {
-                            return false;
+        if (chunkGen.getSettings() instanceof OverworldGenSettings) {
+            if (chunkPosX == chunkpos.x && chunkPosZ == chunkpos.z) {
+                Biome biome = chunkGen.getBiomeProvider().getBiome(new BlockPos(chunkPosX * 16 + 9, 0, chunkPosZ * 16 + 9));
+                if (chunkGen.hasStructure(biome, FeatureRegister.HUNTER_HOUSE)) {
+                    for (int k = chunkPosX - 10; k <= chunkPosX + 10; ++k) {
+                        for (int l = chunkPosZ - 10; l <= chunkPosZ + 10; ++l) {
+                            if (Feature.VILLAGE.hasStartAt(chunkGen, rand, k, l)) {
+                                return false;
+                            }
                         }
                     }
-                }
 
-                return true;
+                    return true;
+                }
             }
         }
 
@@ -84,7 +90,7 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
         return 8;
     }
 
-    public static class Start extends MarginedStructureStart {
+    public static class Start extends StructureStart {
         public Start(Structure<?> p_i50460_1_, int p_i50460_2_, int p_i50460_3_, Biome p_i50460_4_, MutableBoundingBox p_i50460_5_, int p_i50460_6_, long p_i50460_7_) {
             super(p_i50460_1_, p_i50460_2_, p_i50460_3_, p_i50460_4_, p_i50460_5_, p_i50460_6_, p_i50460_7_);
         }
@@ -95,6 +101,39 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
             Rotation rotation = Rotation.values()[this.rand.nextInt(Rotation.values().length)];
             HunterHousePieces.addStructure(templateManagerIn, blockpos, rotation, this.components, this.rand);
             this.recalculateStructureSize();
+        }
+
+        public void generateStructure(IWorld worldIn, Random rand, MutableBoundingBox structurebb, ChunkPos pos) {
+            super.generateStructure(worldIn, rand, structurebb, pos);
+            int i = this.bounds.minY;
+
+            for (int j = structurebb.minX; j <= structurebb.maxX; ++j) {
+                for (int k = structurebb.minZ; k <= structurebb.maxZ; ++k) {
+                    BlockPos blockpos = new BlockPos(j, i, k);
+                    if (!worldIn.isAirBlock(blockpos) && this.bounds.isVecInside(blockpos)) {
+                        boolean flag = false;
+
+                        for (StructurePiece structurepiece : this.components) {
+                            if (structurepiece.getBoundingBox().isVecInside(blockpos)) {
+                                flag = true;
+                                break;
+                            }
+                        }
+
+                        if (flag) {
+                            for (int l = i - 1; l > 1; --l) {
+                                BlockPos blockpos1 = new BlockPos(j, l, k);
+                                if (!worldIn.isAirBlock(blockpos1) && !worldIn.getBlockState(blockpos1).getMaterial().isLiquid()) {
+                                    break;
+                                }
+
+                                worldIn.setBlockState(blockpos1, Blocks.DIRT.getDefaultState(), 2);
+                            }
+                        }
+                    }
+                }
+            }
+
         }
     }
 }
