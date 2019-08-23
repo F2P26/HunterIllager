@@ -2,6 +2,8 @@ package baguchan.hunterillager.entity;
 
 import baguchan.hunterillager.HunterIllagerCore;
 import baguchan.hunterillager.HunterSounds;
+import baguchan.hunterillager.entity.ai.GotoBedGoal;
+import baguchan.hunterillager.entity.ai.WakeUpGoal;
 import com.google.common.collect.Maps;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -84,9 +86,11 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         this.goalSelector.addGoal(0, new SwimGoal(this));
         this.goalSelector.addGoal(2, new OpenDoorGoal(this, true));
         this.goalSelector.addGoal(4, new RangedBowAttackGoal<>(this, 0.7D, 20, 15.0F));
-        this.goalSelector.addGoal(6, new MoveToGoal(this, 10.0D, 0.8D));
-        this.goalSelector.addGoal(8, new RandomWalkingGoal(this, 0.75D));
-        this.goalSelector.addGoal(9, new LookAtGoal(this, PlayerEntity.class, 3.0F, 1.0F));
+        this.goalSelector.addGoal(6, new WakeUpGoal(this));
+        this.goalSelector.addGoal(7, new GotoBedGoal(this, 0.7D));
+        this.goalSelector.addGoal(8, new MoveToGoal(this, 10.0D, 0.8D));
+        this.goalSelector.addGoal(9, new RandomWalkingGoal(this, 0.75D));
+        this.goalSelector.addGoal(10, new LookAtGoal(this, PlayerEntity.class, 3.0F, 1.0F));
         this.goalSelector.addGoal(10, new LookAtGoal(this, MobEntity.class, 8.0F));
         this.targetSelector.addGoal(1, (new HurtByTargetGoal(this, AbstractRaiderEntity.class)).setCallsForHelp());
         this.targetSelector.addGoal(2, (new NearestAttackableTargetGoal<>(this, PlayerEntity.class, true)).setUnseenMemoryTicks(300));

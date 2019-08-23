@@ -83,7 +83,7 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
     }
 
     protected int getBiomeFeatureDistance(ChunkGenerator<?> chunkGenerator) {
-        return 20;
+        return 26;
     }
 
     protected int getBiomeFeatureSeparation(ChunkGenerator<?> chunkGenerator) {
