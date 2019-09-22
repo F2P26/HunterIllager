@@ -1,5 +1,6 @@
 package baguchan.hunterillager.structure;
 
+import baguchan.hunterillager.HunterIllagerCore;
 import com.mojang.datafixers.Dynamic;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.Rotation;
@@ -67,7 +68,7 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
     }
 
     public String getStructureName() {
-        return "HunterHouse";
+        return HunterIllagerCore.MODID + "hunterhouse";
     }
 
     public int getSize() {
