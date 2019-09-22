@@ -16,6 +16,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.DarkForestBiome;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.feature.structure.StructurePiece;
 import net.minecraft.world.gen.feature.structure.TemplateStructurePiece;
@@ -32,12 +34,17 @@ public class HunterHousePieces {
     private static final ResourceLocation campbaseTemplate = new ResourceLocation(HunterIllagerCore.MODID, "illager_campbase");
 
     private static final ResourceLocation woodhutTemplate = new ResourceLocation(HunterIllagerCore.MODID, "illager_woodhut");
+    private static final ResourceLocation darkWoodhutTemplate = new ResourceLocation(HunterIllagerCore.MODID, "illager_darkwoodhut");
 
-    private static final Map<ResourceLocation, BlockPos> structurePos = ImmutableMap.of(campbaseTemplate, BlockPos.ZERO, woodhutTemplate, new BlockPos(8, 0, 0));
+    private static final Map<ResourceLocation, BlockPos> structurePos = ImmutableMap.of(campbaseTemplate, BlockPos.ZERO, woodhutTemplate, new BlockPos(7, 0, 0), darkWoodhutTemplate, new BlockPos(7, 0, 0));
 
-    public static void addStructure(TemplateManager p_207617_0_, BlockPos p_207617_1_, Rotation p_207617_2_, List<StructurePiece> p_207617_3_, Random p_207617_4_) {
+    public static void addStructure(TemplateManager p_207617_0_, BlockPos p_207617_1_, Rotation p_207617_2_, List<StructurePiece> p_207617_3_, Random p_207617_4_, Biome biome) {
         if (p_207617_4_.nextDouble() < 0.5D) {
-            p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, woodhutTemplate, p_207617_1_, p_207617_2_, 0));
+            if (biome instanceof DarkForestBiome) {
+                p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, darkWoodhutTemplate, p_207617_1_, p_207617_2_, 0));
+            } else {
+                p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, woodhutTemplate, p_207617_1_, p_207617_2_, 0));
+            }
         }
         p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, campbaseTemplate, p_207617_1_, p_207617_2_, 0));
     }
@@ -103,12 +110,9 @@ public class HunterHousePieces {
             this.templatePosition = this.templatePosition.add(0, i - 90 - 1, 0);
             boolean flag = super.addComponentParts(worldIn, randomIn, structureBoundingBoxIn, p_74875_4_);
 
-            if (this.field_207615_d.equals(HunterHousePieces.woodhutTemplate)) {
+            if (this.field_207615_d.equals(HunterHousePieces.woodhutTemplate) || this.field_207615_d.equals(HunterHousePieces.darkWoodhutTemplate)) {
                 BlockPos blockpos3 = this.templatePosition.add(Template.transformedBlockPos(placementsettings, new BlockPos(7, 0, 8)));
                 BlockState blockstate = worldIn.getBlockState(blockpos3.down());
-                if (!blockstate.isAir()) {
-                    worldIn.setBlockState(blockpos3, Blocks.DIRT.getDefaultState(), 3);
-                }
             }
 
 

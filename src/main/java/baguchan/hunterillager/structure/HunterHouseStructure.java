@@ -68,7 +68,7 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
     }
 
     public String getStructureName() {
-        return HunterIllagerCore.MODID + "hunterhouse";
+        return HunterIllagerCore.MODID + ":hunterhouse";
     }
 
     public int getSize() {
@@ -100,7 +100,7 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
             BlockPos blockpos = new BlockPos(chunkX * 16, 90, chunkZ * 16);
 
             Rotation rotation = Rotation.values()[this.rand.nextInt(Rotation.values().length)];
-            HunterHousePieces.addStructure(templateManagerIn, blockpos, rotation, this.components, this.rand);
+            HunterHousePieces.addStructure(templateManagerIn, blockpos, rotation, this.components, this.rand, biomeIn);
             this.recalculateStructureSize();
         }
 

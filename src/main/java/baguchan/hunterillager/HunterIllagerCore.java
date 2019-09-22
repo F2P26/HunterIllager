@@ -36,6 +36,7 @@ public class HunterIllagerCore {
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, this::onItemsRegistry);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(EntityType.class, this::onEntityRegistry);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Feature.class, this::onFeatureRegistry);
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
 
