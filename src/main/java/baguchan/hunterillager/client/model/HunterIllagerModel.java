@@ -5,7 +5,6 @@ import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.IHasArm;
 import net.minecraft.client.renderer.entity.model.IHasHead;
 import net.minecraft.client.renderer.entity.model.RendererModel;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.AbstractIllagerEntity;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.math.MathHelper;
@@ -80,7 +79,7 @@ public class HunterIllagerModel<T extends HunterIllagerEntity> extends EntityMod
 
     @Override
     public void render(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-        this.func_212844_a_(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+        this.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
         this.head.render(scale);
         this.body2.render(scale);
         this.leftLeg.render(scale);
@@ -101,7 +100,8 @@ public class HunterIllagerModel<T extends HunterIllagerEntity> extends EntityMod
         }
     }
 
-    public void func_212844_a_(T p_212844_1_, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor)
+    @Override
+    public void setRotationAngles(T p_212844_1_, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor)
     {
         this.head.rotateAngleY = netHeadYaw * 0.017453292F;
         this.head.rotateAngleX = headPitch * 0.017453292F;
@@ -116,24 +116,19 @@ public class HunterIllagerModel<T extends HunterIllagerEntity> extends EntityMod
 
         AbstractIllagerEntity.ArmPose abstractillager$illagerarmpose = ((AbstractIllagerEntity)p_212844_1_).getArmPose();
 
-        if (abstractillager$illagerarmpose == AbstractIllagerEntity.ArmPose.ATTACKING)
-        {
-            float f = MathHelper.sin(limbSwing * (float)Math.PI);
-            float f1 = MathHelper.sin((1.0F - (1.0F - limbSwing) * (1.0F - limbSwing)) * (float)Math.PI);
+        if (abstractillager$illagerarmpose == AbstractIllagerEntity.ArmPose.ATTACKING) {
+            float f = MathHelper.sin(this.swingProgress * (float) Math.PI);
+            float f1 = MathHelper.sin((1.0F - (1.0F - this.swingProgress) * (1.0F - this.swingProgress)) * (float) Math.PI);
             this.rightHand.rotateAngleZ = 0.0F;
             this.leftHand.rotateAngleZ = 0.0F;
             this.rightHand.rotateAngleY = 0.15707964F;
             this.leftHand.rotateAngleY = -0.15707964F;
-
-            if (((LivingEntity)p_212844_1_).getPrimaryHand() == HandSide.RIGHT)
-            {
+            if (p_212844_1_.getPrimaryHand() == HandSide.RIGHT) {
                 this.rightHand.rotateAngleX = -1.8849558F + MathHelper.cos(ageInTicks * 0.09F) * 0.15F;
                 this.leftHand.rotateAngleX = -0.0F + MathHelper.cos(ageInTicks * 0.19F) * 0.5F;
                 this.rightHand.rotateAngleX += f * 2.2F - f1 * 0.4F;
                 this.leftHand.rotateAngleX += f * 1.2F - f1 * 0.4F;
-            }
-            else
-            {
+            } else {
                 this.rightHand.rotateAngleX = -0.0F + MathHelper.cos(ageInTicks * 0.19F) * 0.5F;
                 this.leftHand.rotateAngleX = -1.8849558F + MathHelper.cos(ageInTicks * 0.09F) * 0.15F;
                 this.rightHand.rotateAngleX += f * 1.2F - f1 * 0.4F;
@@ -144,8 +139,7 @@ public class HunterIllagerModel<T extends HunterIllagerEntity> extends EntityMod
             this.leftHand.rotateAngleZ -= MathHelper.cos(ageInTicks * 0.09F) * 0.05F + 0.05F;
             this.rightHand.rotateAngleX += MathHelper.sin(ageInTicks * 0.067F) * 0.05F;
             this.leftHand.rotateAngleX -= MathHelper.sin(ageInTicks * 0.067F) * 0.05F;
-        }
-        else if (abstractillager$illagerarmpose == AbstractIllagerEntity.ArmPose.SPELLCASTING)
+        } else if (abstractillager$illagerarmpose == AbstractIllagerEntity.ArmPose.SPELLCASTING)
         {
             this.rightHand.rotationPointZ = 0.0F;
             this.rightHand.rotationPointX = -5.0F;

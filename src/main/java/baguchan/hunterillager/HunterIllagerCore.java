@@ -44,8 +44,8 @@ public class HunterIllagerCore {
         MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
 
         ForgeRegistries.BIOMES.getValues().stream().forEach((biome -> {
+            biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(FeatureRegister.HUNTER_HOUSE, IFeatureConfig.NO_FEATURE_CONFIG, Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
             if (biome.getCategory() == Biome.Category.FOREST || biome.getCategory() == Biome.Category.PLAINS) {
-                biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(FeatureRegister.HUNTER_HOUSE, IFeatureConfig.NO_FEATURE_CONFIG, Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
                 biome.addStructure(FeatureRegister.HUNTER_HOUSE, IFeatureConfig.NO_FEATURE_CONFIG);
             }
         }));

@@ -3,9 +3,10 @@ package baguchan.hunterillager.entity;
 import baguchan.hunterillager.HunterIllagerCore;
 import baguchan.hunterillager.HunterSounds;
 import baguchan.hunterillager.entity.ai.GotoBedGoal;
-import baguchan.hunterillager.entity.ai.RangedCustomiseAttackGoal;
+import baguchan.hunterillager.entity.ai.RangedAggroedAttackGoal;
 import baguchan.hunterillager.entity.ai.WakeUpGoal;
 import baguchan.hunterillager.entity.projectile.BoomerangEntity;
+import baguchan.hunterillager.item.BoomerangItem;
 import baguchan.hunterillager.item.HunterItems;
 import com.google.common.collect.Maps;
 import net.minecraft.enchantment.Enchantment;
@@ -28,7 +29,6 @@ import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.BowItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -53,11 +53,16 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 
 public class HunterIllagerEntity extends AbstractIllagerEntity implements IRangedAttackMob {
+    private static final Predicate<ItemEntity> field_213665_b = (p_213647_0_) -> {
+        return !p_213647_0_.cannotPickup() && p_213647_0_.isAlive() && ItemStack.areItemStacksEqual(p_213647_0_.getItem(), new ItemStack(HunterItems.BOOMERANG));
+    };
+
     private static final UUID MODIFIER_UUID = UUID.fromString("5CD17E52-A79A-43D3-A529-90FDE04B181E");
     private static final AttributeModifier MODIFIER = (new AttributeModifier(MODIFIER_UUID, "Drinking speed penalty", -0.25D, AttributeModifier.Operation.ADDITION)).setSaved(false);
     private static final DataParameter<Boolean> IS_EATING = EntityDataManager.createKey(HunterIllagerEntity.class, DataSerializers.BOOLEAN);
@@ -80,6 +85,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         this.experienceValue = 6;
         ((GroundPathNavigator) this.getNavigator()).setBreakDoors(true);
         this.setDropChance(EquipmentSlotType.OFFHAND, 0.4F);
+        this.setCanPickUpLoot(true);
     }
 
 
@@ -87,12 +93,30 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(0, new SwimGoal(this));
-        this.goalSelector.addGoal(2, new OpenDoorGoal(this, true));
-        this.goalSelector.addGoal(4, new RangedCustomiseAttackGoal<>(this, 0.5D, 20, 15.0F));
+        this.goalSelector.addGoal(1, new OpenDoorGoal(this, true));
+        this.goalSelector.addGoal(2, new HunterIllagerEntity.GetBackBoomerangGoal<>(this));
+        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.8F, false) {
+            @Override
+            public boolean shouldExecute() {
+                return !isHolding(Items.BOW) && !isHolding(HunterItems.BOOMERANG) && super.shouldExecute();
+            }
+        });
+        this.goalSelector.addGoal(4, new RangedAggroedAttackGoal(this, 0.7D, 40, 16.0F) {
+            @Override
+            public boolean shouldExecute() {
+                return !isHolding(Items.BOW) && isHolding(HunterItems.BOOMERANG) && super.shouldExecute();
+            }
+        });
+        this.goalSelector.addGoal(4, new RangedBowAttackGoal(this, 0.7D, 25, 15.0F) {
+            @Override
+            public boolean shouldExecute() {
+                return isHolding(Items.BOW) && !isHolding(HunterItems.BOOMERANG) && super.shouldExecute();
+            }
+        });
         this.goalSelector.addGoal(6, new WakeUpGoal(this));
-        this.goalSelector.addGoal(7, new GotoBedGoal(this, 0.55D));
-        this.goalSelector.addGoal(8, new MoveToGoal(this, 10.0D, 0.58D));
-        this.goalSelector.addGoal(9, new RandomWalkingGoal(this, 0.55D));
+        this.goalSelector.addGoal(7, new GotoBedGoal(this, 0.7D));
+        this.goalSelector.addGoal(8, new MoveToGoal(this, 10.0D, 0.7D));
+        this.goalSelector.addGoal(9, new RandomWalkingGoal(this, 0.65D));
         this.goalSelector.addGoal(10, new LookAtGoal(this, PlayerEntity.class, 3.0F, 1.0F));
         this.goalSelector.addGoal(10, new LookAtGoal(this, MobEntity.class, 8.0F));
         this.targetSelector.addGoal(1, (new HurtByTargetGoal(this, AbstractRaiderEntity.class)).setCallsForHelp());
@@ -110,7 +134,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
     @Override
     protected void registerAttributes() {
         super.registerAttributes();
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue((double) 0.5F);
+        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue((double) 0.35D);
         this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(22.0D);
         this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(26.0D);
         this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0D);
@@ -130,6 +154,8 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
             this.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.BOW));
         } else {
             this.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(HunterItems.BOOMERANG));
+            this.inventory.addItem(new ItemStack(HunterItems.BOOMERANG));
+            this.inventory.addItem(new ItemStack(HunterItems.BOOMERANG));
         }
     }
 
@@ -230,6 +256,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         return this.inventory;
     }
 
+    @Override
     protected void updateEquipmentIfNeeded(ItemEntity itemEntity) {
         ItemStack itemstack = itemEntity.getItem();
         Item item = itemstack.getItem();
@@ -240,6 +267,20 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
             } else {
                 itemstack.setCount(itemstack1.getCount());
             }
+        } else if ((this.getHeldItem(Hand.MAIN_HAND).isEmpty() || this.getHeldItem(Hand.MAIN_HAND).getItem() == HunterItems.BOOMERANG) && ItemStack.areItemStacksEqual(itemstack, new ItemStack(HunterItems.BOOMERANG))) {
+            EquipmentSlotType equipmentslottype = EquipmentSlotType.MAINHAND;
+
+            ItemStack itemstack1 = this.inventory.addItem(itemstack);
+            if (!this.getHeldItem(Hand.MAIN_HAND).isEmpty()) {
+                if (itemstack1.isEmpty()) {
+                    itemEntity.remove();
+                } else {
+                    itemstack.setCount(itemstack1.getCount());
+                }
+            } else {
+                this.setItemStackToSlot(equipmentslottype, itemstack);
+            }
+            this.onItemPickup(itemEntity, itemstack.getCount());
         } else {
             super.updateEquipmentIfNeeded(itemEntity);
         }
@@ -295,6 +336,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
                             this.setItemStackToSlot(EquipmentSlotType.OFFHAND, itemstack1);
                         }
                     }
+                    this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(MODIFIER);
                 } else if (this.foodUseTimer >= 0 && this.ticksExisted % 4 == 0) {
                     this.world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_GENERIC_EAT, this.getSoundCategory(), 1.0F, 0.8F + this.rand.nextFloat() * 0.4F);
                 }
@@ -316,6 +358,16 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
             if (this.rand.nextFloat() < 7.5E-4F) {
                 this.world.setEntityState(this, (byte) 15);
             }
+
+            if (this.ticksExisted % 20 == 0) {
+                ItemStack boomerang = findBoomerang();
+
+                if (this.getHeldItem(Hand.MAIN_HAND).isEmpty() && !boomerang.isEmpty()) {
+                    this.setItemStackToSlot(EquipmentSlotType.MAINHAND, boomerang.copy());
+
+                    boomerang.shrink(1);
+                }
+            }
         }
 
         super.livingTick();
@@ -327,6 +379,20 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
             ItemStack stack = this.inventory.getStackInSlot(i);
 
             if (!stack.isEmpty() && this.isFoods(stack.getItem())) {
+                return stack;
+            } else {
+                return ItemStack.EMPTY;
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    public ItemStack findBoomerang() {
+
+        for (int i = 0; i < this.inventory.getSizeInventory(); i++) {
+            ItemStack stack = this.inventory.getStackInSlot(i);
+
+            if (!stack.isEmpty() && stack.getItem() == HunterItems.BOOMERANG) {
                 return stack;
             } else {
                 return ItemStack.EMPTY;
@@ -401,7 +467,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         net.minecraft.item.ItemStack main = getHeldItemMainhand();
         net.minecraft.item.ItemStack off = getHeldItemOffhand();
 
-        if (main.getItem() instanceof BowItem || off.getItem() instanceof BowItem) {
+        if (isHolding(Items.BOW)) {
             ItemStack itemstack = this.findAmmo(this.getHeldItem(ProjectileHelper.getHandWith(this, Items.BOW)));
             AbstractArrowEntity abstractarrowentity = ProjectileHelper.func_221272_a(this, itemstack, distanceFactor * 1.15F);
             if (this.getHeldItemMainhand().getItem() instanceof net.minecraft.item.BowItem)
@@ -414,20 +480,32 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
             this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRNG().nextFloat() * 0.4F + 0.8F));
             world.addEntity(abstractarrowentity);
         } else {
-
-            BoomerangEntity projectile = new BoomerangEntity(world, this, new ItemStack(HunterItems.BOOMERANG));
-            projectile.shoot(this, this.rotationPitch, this.rotationYaw, 0.0F, 1.2F, 1.0F);
-            world.addEntity(projectile);
             //world.playSound(null, entity.posX, entity.posY, entity.posZ, HunterSounds.ITEM_BOOMERANG_THROW, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
-            world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_EGG_THROW, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+            this.playSound(SoundEvents.ENTITY_EGG_THROW, 1.0f, 1.0f);
 
+            if (main.getItem() instanceof BoomerangItem) {
+                BoomerangEntity projectile = new BoomerangEntity(world, this, main.copy());
+                projectile.shoot(this, this.rotationPitch, this.rotationYaw, 0.0F, 1.0F, 1.0F);
+                world.addEntity(projectile);
+                main.shrink(1);
+            } else if (off.getItem() instanceof BoomerangItem) {
+                BoomerangEntity projectile = new BoomerangEntity(world, this, off.copy());
+                projectile.shoot(this, this.rotationPitch, this.rotationYaw, 0.0F, 1.0F, 1.0F);
+                world.addEntity(projectile);
+                off.shrink(1);
+            }
         }
     }
 
     @OnlyIn(Dist.CLIENT)
     public AbstractIllagerEntity.ArmPose getArmPose() {
-        return this.isAggressive() ? AbstractIllagerEntity.ArmPose.BOW_AND_ARROW : AbstractIllagerEntity.ArmPose.CROSSED;
+        if (this.isHolding(Items.BOW) || this.isHolding(HunterItems.BOOMERANG)) {
+            return this.isAggressive() ? AbstractIllagerEntity.ArmPose.BOW_AND_ARROW : AbstractIllagerEntity.ArmPose.CROSSED;
+        } else {
+            return this.isAggressive() ? ArmPose.ATTACKING : AbstractIllagerEntity.ArmPose.CROSSED;
+        }
+
     }
 
     class MoveToGoal extends Goal {
@@ -476,6 +554,45 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
 
         private boolean func_220846_a(BlockPos p_220846_1_, double p_220846_2_) {
             return !p_220846_1_.withinDistance(this.hunterIllager.getPositionVec(), p_220846_2_);
+        }
+    }
+
+    public class GetBackBoomerangGoal<T extends HunterIllagerEntity> extends Goal {
+        private final T illager;
+
+        public GetBackBoomerangGoal(T p_i50572_2_) {
+            this.illager = p_i50572_2_;
+            this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
+        }
+
+        /**
+         * Returns whether the EntityAIBase should begin execution.
+         */
+        public boolean shouldExecute() {
+            if ((this.illager.getHeldItem(Hand.MAIN_HAND).isEmpty() || this.illager.getHeldItem(Hand.MAIN_HAND).getItem() == HunterItems.BOOMERANG)) {
+                List<ItemEntity> list = this.illager.world.getEntitiesWithinAABB(ItemEntity.class, this.illager.getBoundingBox().grow(16.0D, 8.0D, 16.0D), HunterIllagerEntity.field_213665_b);
+                if (!list.isEmpty()) {
+                    return this.illager.getNavigator().tryMoveToEntityLiving(list.get(0), 0.75D);
+                }
+
+
+                return false;
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * Keep ticking a continuous task that has already been started
+         */
+        public void tick() {
+            if (this.illager.getNavigator().getTargetPos().withinDistance(this.illager.getPositionVec(), 1.414D)) {
+                List<ItemEntity> list = this.illager.world.getEntitiesWithinAABB(ItemEntity.class, this.illager.getBoundingBox().grow(4.0D, 4.0D, 4.0D), HunterIllagerEntity.field_213665_b);
+                if (!list.isEmpty()) {
+                    this.illager.updateEquipmentIfNeeded(list.get(0));
+                }
+            }
+
         }
     }
 }

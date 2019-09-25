@@ -36,7 +36,6 @@ import java.util.UUID;
 
 public class BoomerangEntity extends Entity implements IProjectile {
     private static final DataParameter<Boolean> RETURNING = EntityDataManager.createKey(BoomerangEntity.class, DataSerializers.BOOLEAN);
-    private static final DataParameter<Boolean> CANDROP = EntityDataManager.createKey(BoomerangEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<ItemStack> BOOMERANG = EntityDataManager.createKey(BoomerangEntity.class, DataSerializers.ITEMSTACK);
 
     @Nullable
@@ -127,12 +126,20 @@ public class BoomerangEntity extends Entity implements IProjectile {
         }
     }
 
-    public void drop(double x, double y, double z) {
-        if (this.isCanDrop()) {
-            if (!(this.getShooter() instanceof PlayerEntity) || (this.getShooter() instanceof PlayerEntity && !((PlayerEntity) this.getShooter()).isCreative())) {
-                this.world.addEntity(new ItemEntity(this.world, x, y, z, this.getBoomerang().copy()));
-            }
+    @Override
+    public void applyEntityCollision(Entity entityIn) {
+        super.applyEntityCollision(entityIn);
+        if (!this.world.isRemote && this.isReturning() && entityIn == this.getShooter()) {
+            this.drop(this.getShooter().posX, this.getShooter().posY, this.getShooter().posZ);
         }
+    }
+
+    public void drop(double x, double y, double z) {
+
+        if (!(this.getShooter() instanceof PlayerEntity) || (this.getShooter() instanceof PlayerEntity && !((PlayerEntity) this.getShooter()).isCreative())) {
+            this.world.addEntity(new ItemEntity(this.world, x, y, z, this.getBoomerang().copy()));
+        }
+
         this.remove();
     }
 
@@ -288,7 +295,6 @@ public class BoomerangEntity extends Entity implements IProjectile {
     @Override
     protected void registerData() {
         this.dataManager.register(RETURNING, false);
-        this.dataManager.register(CANDROP, false);
         this.dataManager.register(BOOMERANG, ItemStack.EMPTY);
     }
 
@@ -299,7 +305,6 @@ public class BoomerangEntity extends Entity implements IProjectile {
         }
 
         nbt.put("boomerang", this.getBoomerang().write(new CompoundNBT()));
-        nbt.putBoolean("canDrop", this.isCanDrop());
         nbt.putDouble("throwX", this.throwPos.x);
         nbt.putDouble("throwY", this.throwPos.y);
         nbt.putDouble("throwZ", this.throwPos.z);
@@ -314,7 +319,6 @@ public class BoomerangEntity extends Entity implements IProjectile {
         }
 
         this.setBoomerang(ItemStack.read(nbt.getCompound("boomerang")));
-        this.setCandrop(nbt.getBoolean("canDrop"));
         this.throwPos = new Vec3d(nbt.getDouble("throwX"), nbt.getDouble("throwY"), nbt.getDouble("throwZ"));
         this.hits = nbt.getByte("hits");
         this.setReturning(nbt.getBoolean("returning"));
@@ -326,10 +330,6 @@ public class BoomerangEntity extends Entity implements IProjectile {
 
     public boolean isReturning() {
         return this.dataManager.get(RETURNING);
-    }
-
-    public boolean isCanDrop() {
-        return this.dataManager.get(CANDROP);
     }
 
     public void setShooter(@Nullable Entity entityIn) {
@@ -348,10 +348,6 @@ public class BoomerangEntity extends Entity implements IProjectile {
 
     public double getVelocity() {
         return Math.sqrt(this.getMotion().getX() * this.getMotion().getX() + this.getMotion().getY() * this.getMotion().getY() + this.getMotion().getZ() * this.getMotion().getZ());
-    }
-
-    public void setCandrop(boolean candrop) {
-        this.dataManager.set(CANDROP, candrop);
     }
 
     public void setReturning(boolean returning) {

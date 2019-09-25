@@ -38,7 +38,7 @@ public class BoomerangItem extends Item {
             BoomerangEntity projectile = new BoomerangEntity(world, entity, stack.copy());
             projectile.shoot(entity, entity.rotationPitch, entity.rotationYaw, 0.0F, velocity, 1.0F);
 
-            projectile.setCandrop(true);
+            //projectile.setCandrop(true);
             world.addEntity(projectile);
             //world.playSound(null, entity.posX, entity.posY, entity.posZ, HunterSounds.ITEM_BOOMERANG_THROW, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
