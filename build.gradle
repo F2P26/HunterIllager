@@ -18,7 +18,7 @@ tasks.withType(Jar) {
     compileJava.options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }
 
-version = '1.14.4-0.2.1'
+version = '1.14.4-0.2.2'
 group = 'baguchan.hunterillager' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'hunterillager'
 
@@ -78,7 +78,7 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
 
-    minecraft 'net.minecraftforge:forge:1.14.4-28.1.10'
+    minecraft 'net.minecraftforge:forge:1.14.4-28.1.26'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
