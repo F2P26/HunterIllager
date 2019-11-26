@@ -18,7 +18,7 @@ tasks.withType(Jar) {
     compileJava.options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }
 
-version = '1.14.4-0.2.2'
+version = '1.14.4-0.2.3'
 group = 'baguchan.hunterillager' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'hunterillager'
 
@@ -31,7 +31,7 @@ minecraft {
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
 
-    mappings channel: 'snapshot', version: '20190829-1.14.3'
+    mappings channel: 'snapshot', version: '20190714-1.14.3'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
@@ -78,7 +78,7 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
 
-    minecraft 'net.minecraftforge:forge:1.14.4-28.1.26'
+    minecraft 'net.minecraftforge:forge:1.14.4-28.1.90'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

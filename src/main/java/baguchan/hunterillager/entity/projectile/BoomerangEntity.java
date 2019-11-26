@@ -12,6 +12,7 @@ import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -35,6 +36,7 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 
 public class BoomerangEntity extends Entity implements IProjectile {
+    private static final DataParameter<Byte> LOYALTY_LEVEL = EntityDataManager.createKey(BoomerangEntity.class, DataSerializers.BYTE);
     private static final DataParameter<Boolean> RETURNING = EntityDataManager.createKey(BoomerangEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<ItemStack> BOOMERANG = EntityDataManager.createKey(BoomerangEntity.class, DataSerializers.ITEMSTACK);
 
@@ -42,6 +44,7 @@ public class BoomerangEntity extends Entity implements IProjectile {
     private UUID shootingEntity;
     private Vec3d throwPos;
     private int hits;
+    private int flyTick;
 
     public BoomerangEntity(EntityType<? extends BoomerangEntity> type, World world) {
         super(type, world);
@@ -51,6 +54,7 @@ public class BoomerangEntity extends Entity implements IProjectile {
         super(type, world);
         this.setShooter(shootingEntity);
         this.setBoomerang(boomerang);
+        this.dataManager.set(LOYALTY_LEVEL, (byte) EnchantmentHelper.getLoyaltyModifier(boomerang));
         this.throwPos = new Vec3d(shootingEntity == null ? 0 : shootingEntity.posX, shootingEntity == null ? 0 : shootingEntity.posY + shootingEntity.getEyeHeight() - 0.1, shootingEntity == null ? 0 : shootingEntity.posZ);
         this.setPosition(this.throwPos.x, this.throwPos.y, this.throwPos.z);
         this.hits = 0;
@@ -91,30 +95,49 @@ public class BoomerangEntity extends Entity implements IProjectile {
                 //this.world.playSound(null, this.posX, this.posY, this.posZ, HunterSounds.ITEM_BOOMERANG_HIT, SoundCategory.BLOCKS, 0.5F, 1.0F);
 
                 returnToOwner = true;
-                this.hits += 3;
+                this.hits += 2;
             }
 
-            if (this.isReturning() && this.hits >= 6) {
+            int i = this.dataManager.get(LOYALTY_LEVEL);
+
+            if (this.isReturning() && i < 1 && this.hits >= 6) {
                 this.drop(this.posX, this.posY, this.posZ);
                 return;
             }
 
-            if (returnToOwner) {
-                if (this.getShooter() != null && EnchantmentHelper.getEnchantmentLevel(Enchantments.LOYALTY, this.getBoomerang()) > 0) {
+            if (returnToOwner && !isReturning()) {
+                if (this.getShooter() != null && this.shouldReturnToThrower() && EnchantmentHelper.getEnchantmentLevel(Enchantments.LOYALTY, this.getBoomerang()) > 0) {
                     Entity shooter = this.getShooter();
                     this.world.playSound(null, shooter.getPosition(), SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1);
-                    this.drop(shooter.posX, shooter.posY, shooter.posZ);
+
+                    Vec3d returnVec = this.throwPos.subtract(this.posX, this.posY, this.posZ).normalize();
+                    double velocity = this.getVelocity();
+
+                    this.setMotion(velocity * returnVec.x, velocity * returnVec.y, velocity * returnVec.z);
+
+                    this.markVelocityChanged();
+
+                    this.setReturning(true);
                 } else {
                     Vec3d returnVec = this.throwPos.subtract(this.posX, this.posY, this.posZ).normalize();
                     double velocity = this.getVelocity();
 
-                    this.setMotion(velocity * returnVec.x, -velocity * returnVec.y, velocity * returnVec.z);
+                    this.setMotion(velocity * returnVec.x, velocity * returnVec.y, velocity * returnVec.z);
 
                     this.markVelocityChanged();
 
                     this.setReturning(true);
                 }
             }
+        }
+    }
+
+    private boolean shouldReturnToThrower() {
+        Entity entity = this.getShooter();
+        if (entity != null && entity.isAlive()) {
+            return !(entity instanceof ServerPlayerEntity) || !entity.isSpectator();
+        } else {
+            return false;
         }
     }
 
@@ -143,36 +166,21 @@ public class BoomerangEntity extends Entity implements IProjectile {
         this.remove();
     }
 
-    public void shoot(Entity entityThrower, float rotationPitchIn, float rotationYawIn, float pitchOffset, float velocity, float inaccuracy) {
+    public void shoot(Entity shooter, float rotationPitchIn, float rotationYawIn, float pitchOffset, float velocity, float inaccuracy) {
         float f = -MathHelper.sin(rotationYawIn * ((float) Math.PI / 180F)) * MathHelper.cos(rotationPitchIn * ((float) Math.PI / 180F));
-        float f1 = MathHelper.sin((rotationPitchIn + pitchOffset) * ((float) Math.PI / 180F));
+        float f1 = -MathHelper.sin(rotationPitchIn * ((float) Math.PI / 180F));
         float f2 = MathHelper.cos(rotationYawIn * ((float) Math.PI / 180F)) * MathHelper.cos(rotationPitchIn * ((float) Math.PI / 180F));
         this.shoot((double) f, (double) f1, (double) f2, velocity, inaccuracy);
-        this.getMotion().add(entityThrower.getMotion().getX(), 0.0F, entityThrower.getMotion().getZ());
-
-        if (!entityThrower.onGround) {
-            this.getMotion().add(0.0F, entityThrower.getMotion().getY(), 0.0F);
-        }
+        this.setMotion(this.getMotion().add(shooter.getMotion().x, shooter.onGround ? 0.0D : shooter.getMotion().y, shooter.getMotion().z));
     }
 
     @Override
     public void shoot(double x, double y, double z, float velocity, float inaccuracy) {
-        float f = MathHelper.sqrt(x * x + y * y + z * z);
-        x = x / (double) f;
-        y = y / (double) f;
-        z = z / (double) f;
-        x = x + this.rand.nextGaussian() * (double) 0.0075F * (double) inaccuracy;
-        y = y + this.rand.nextGaussian() * (double) 0.0075F * (double) inaccuracy;
-        z = z + this.rand.nextGaussian() * (double) 0.0075F * (double) inaccuracy;
-        x = x * (double) velocity;
-        y = y * (double) velocity;
-        z = z * (double) velocity;
-
-        this.setMotion(x, y, z);
-
-        float f1 = MathHelper.sqrt(x * x + z * z);
-        this.rotationYaw = (float) (MathHelper.atan2(x, z) * (double) (180F / (float) Math.PI));
-        this.rotationPitch = (float) (MathHelper.atan2(y, (double) f1) * (double) (180F / (float) Math.PI));
+        Vec3d vec3d = (new Vec3d(x, y, z)).normalize().add(this.rand.nextGaussian() * (double) 0.0075F * (double) inaccuracy, this.rand.nextGaussian() * (double) 0.0075F * (double) inaccuracy, this.rand.nextGaussian() * (double) 0.0075F * (double) inaccuracy).scale((double) velocity);
+        this.setMotion(vec3d);
+        float f = MathHelper.sqrt(func_213296_b(vec3d));
+        this.rotationYaw = (float) (MathHelper.atan2(vec3d.x, vec3d.z) * (double) (180F / (float) Math.PI));
+        this.rotationPitch = (float) (MathHelper.atan2(vec3d.y, (double) f) * (double) (180F / (float) Math.PI));
         this.prevRotationYaw = this.rotationYaw;
         this.prevRotationPitch = this.rotationPitch;
     }
@@ -185,6 +193,8 @@ public class BoomerangEntity extends Entity implements IProjectile {
         this.lastTickPosY = this.posY;
         this.lastTickPosZ = this.posZ;
         super.tick();
+
+        this.flyTick++;
 
         Vec3d vec3d = new Vec3d(this.posX, this.posY, this.posZ);
 
@@ -220,7 +230,7 @@ public class BoomerangEntity extends Entity implements IProjectile {
 
 
         this.posX += this.getMotion().getX();
-        this.posY -= this.getMotion().getY();
+        this.posY += this.getMotion().getY();
         this.posZ += this.getMotion().getZ();
         float f = MathHelper.sqrt(this.getMotion().getX() * this.getMotion().getX() + this.getMotion().getZ() * this.getMotion().getZ());
         this.rotationYaw = (float) (MathHelper.atan2(this.getMotion().getX(), this.getMotion().getZ()) * (double) (180F / (float) Math.PI));
@@ -253,14 +263,37 @@ public class BoomerangEntity extends Entity implements IProjectile {
             f1 = 0.8;
         }
 
-        if (this.isReturning()) {
-            f2 *= 0.5;
+        int i = this.dataManager.get(LOYALTY_LEVEL);
+
+        Entity entity = this.getShooter();
+
+        if (i > 0 && !this.isReturning() && this.flyTick == 120) {
+            if (entity != null) {
+                this.world.playSound(null, entity.getPosition(), SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1);
+                this.setReturning(true);
+            }
         }
 
-        if (!this.hasNoGravity()) {
-            this.setMotion(this.getMotion().add(0.0F, f2, 0.0F));
+        if (i > 0 && entity != null && !this.shouldReturnToThrower() && this.isReturning()) {
+            if (!this.world.isRemote) {
+                this.drop(this.posX, this.posY, this.posZ);
+            }
+
+            this.remove();
+        } else if (i > 0 && entity != null && this.isReturning()) {
+            this.noClip = true;
+            Vec3d vec3d2 = new Vec3d(entity.posX - this.posX, entity.posY + (double) entity.getEyeHeight() - this.posY, entity.posZ - this.posZ);
+            if (this.world.isRemote) {
+                this.lastTickPosY = this.posY;
+            }
+
+            double d0 = 0.05D * (double) i;
+            this.setMotion(this.getMotion().scale(0.95D).add(vec3d2.normalize().scale(d0)));
+        } else if (!this.hasNoGravity()) {
+            this.setMotion(this.getMotion().add(0.0F, -f2, 0.0F));
+            this.setMotion(this.getMotion().scale(f1));
+
         }
-        this.setMotion(this.getMotion().scale(f1));
 
         this.setPosition(this.posX, this.posY, this.posZ);
     }
@@ -294,6 +327,7 @@ public class BoomerangEntity extends Entity implements IProjectile {
 
     @Override
     protected void registerData() {
+        this.dataManager.register(LOYALTY_LEVEL, (byte) 0);
         this.dataManager.register(RETURNING, false);
         this.dataManager.register(BOOMERANG, ItemStack.EMPTY);
     }
@@ -322,6 +356,7 @@ public class BoomerangEntity extends Entity implements IProjectile {
         this.throwPos = new Vec3d(nbt.getDouble("throwX"), nbt.getDouble("throwY"), nbt.getDouble("throwZ"));
         this.hits = nbt.getByte("hits");
         this.setReturning(nbt.getBoolean("returning"));
+        this.dataManager.set(LOYALTY_LEVEL, (byte) EnchantmentHelper.getLoyaltyModifier(this.getBoomerang()));
     }
 
     private double getGravityVelocity() {
