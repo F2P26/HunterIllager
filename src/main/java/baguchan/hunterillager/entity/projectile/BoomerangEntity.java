@@ -84,7 +84,7 @@ public class BoomerangEntity extends Entity implements IProjectile {
             if (result.getType() == RayTraceResult.Type.ENTITY && ((EntityRayTraceResult) result).getEntity() != this.getShooter()) {
                 Entity shooter = this.getShooter();
                 int sharpness = EnchantmentHelper.getEnchantmentLevel(Enchantments.SHARPNESS, this.getBoomerang());
-                ((EntityRayTraceResult) result).getEntity().attackEntityFrom(DamageSource.causeThrownDamage(this, shooter), (float) (2 * Math.sqrt(this.getMotion().getX() * this.getMotion().getX() + (this.getMotion().getY() * this.getMotion().getY()) * 0.5F + this.getMotion().getZ() * this.getMotion().getZ()) + Math.min(1, sharpness) + Math.max(0, sharpness - 1) * 0.5));
+                ((EntityRayTraceResult) result).getEntity().attackEntityFrom(DamageSource.causeThrownDamage(this, shooter), (float) (3 * Math.sqrt(this.getMotion().getX() * this.getMotion().getX() + (this.getMotion().getY() * this.getMotion().getY()) * 0.5F + this.getMotion().getZ() * this.getMotion().getZ()) + Math.min(1, sharpness) + Math.max(0, sharpness - 1) * 0.5));
 
 
 
