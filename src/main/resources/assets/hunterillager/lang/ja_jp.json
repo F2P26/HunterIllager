@@ -5,5 +5,7 @@
   "container.hunterillager.quivers": "大きめの矢筒",
 
   "entity.hunterillager.hunterillager": "邪悪なハンター",
-  "hunterillager:subtitles.hunterillager.laugh": "邪悪なハンターが笑う"
+  "hunterillager:subtitles.hunterillager.laugh": "邪悪なハンターが笑う",
+  "death.attack.hunterillager.boomerang": "%1$s はブーメランにあたった",
+  "death.attack.hunterillager.boomerang.player": "%1$s は %2$s のブーメランにあたった"
 }

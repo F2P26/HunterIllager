@@ -95,7 +95,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         this.goalSelector.addGoal(0, new SwimGoal(this));
         this.goalSelector.addGoal(1, new OpenDoorGoal(this, true));
         this.goalSelector.addGoal(2, new HunterIllagerEntity.GetBackBoomerangGoal<>(this));
-        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.8F, false) {
+        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.85F, false) {
             @Override
             public boolean shouldExecute() {
                 return !isHolding(Items.BOW) && !isHolding(HunterItems.BOOMERANG) && super.shouldExecute();
@@ -154,7 +154,6 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
             this.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.BOW));
         } else {
             this.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(HunterItems.BOOMERANG));
-            this.inventory.addItem(new ItemStack(HunterItems.BOOMERANG));
             this.inventory.addItem(new ItemStack(HunterItems.BOOMERANG));
         }
     }
@@ -261,30 +260,14 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         ItemStack itemstack = itemEntity.getItem();
         Item item = itemstack.getItem();
         if (this.isFoods(item)) {
+            this.onItemPickup(itemEntity, itemstack.getCount());
             ItemStack itemstack1 = this.inventory.addItem(itemstack);
             if (itemstack1.isEmpty()) {
                 itemEntity.remove();
             } else {
                 itemstack.setCount(itemstack1.getCount());
             }
-        } else if ((this.getHeldItem(Hand.MAIN_HAND).isEmpty() || this.getHeldItem(Hand.MAIN_HAND).getItem() == HunterItems.BOOMERANG) && ItemStack.areItemStacksEqual(itemstack, new ItemStack(HunterItems.BOOMERANG))) {
-            EquipmentSlotType equipmentslottype = EquipmentSlotType.MAINHAND;
-
-            ItemStack itemstack1 = this.inventory.addItem(itemstack);
-            if (!this.getHeldItem(Hand.MAIN_HAND).isEmpty()) {
-                if (itemstack1.isEmpty()) {
-                    itemEntity.remove();
-                } else {
-                    itemstack.setCount(itemstack1.getCount());
-                }
-            } else {
-                this.setItemStackToSlot(equipmentslottype, itemstack);
-            }
-            this.onItemPickup(itemEntity, itemstack.getCount());
-        } else {
-            super.updateEquipmentIfNeeded(itemEntity);
         }
-
     }
 
     private boolean isFoods(Item item) {
@@ -362,9 +345,8 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
             if (this.ticksExisted % 20 == 0) {
                 ItemStack boomerang = findBoomerang();
 
-                if (this.getHeldItem(Hand.MAIN_HAND).isEmpty() && !boomerang.isEmpty()) {
+                if (this.getHeldItem(Hand.MAIN_HAND).isEmpty() && boomerang.getItem() == HunterItems.BOOMERANG) {
                     this.setItemStackToSlot(EquipmentSlotType.MAINHAND, boomerang.copy());
-
                     boomerang.shrink(1);
                 }
             }
@@ -387,15 +369,13 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         return ItemStack.EMPTY;
     }
 
-    public ItemStack findBoomerang() {
+    protected ItemStack findBoomerang() {
 
         for (int i = 0; i < this.inventory.getSizeInventory(); i++) {
             ItemStack stack = this.inventory.getStackInSlot(i);
 
             if (!stack.isEmpty() && stack.getItem() == HunterItems.BOOMERANG) {
                 return stack;
-            } else {
-                return ItemStack.EMPTY;
             }
         }
         return ItemStack.EMPTY;
@@ -569,10 +549,10 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
          * Returns whether the EntityAIBase should begin execution.
          */
         public boolean shouldExecute() {
-            if ((this.illager.getHeldItem(Hand.MAIN_HAND).isEmpty() || this.illager.getHeldItem(Hand.MAIN_HAND).getItem() == HunterItems.BOOMERANG)) {
+            if ((this.illager.getHeldItem(Hand.MAIN_HAND).isEmpty() || this.illager.getHeldItem(Hand.MAIN_HAND).getItem() == HunterItems.BOOMERANG) && this.illager.findBoomerang().isEmpty()) {
                 List<ItemEntity> list = this.illager.world.getEntitiesWithinAABB(ItemEntity.class, this.illager.getBoundingBox().grow(16.0D, 8.0D, 16.0D), HunterIllagerEntity.field_213665_b);
-                if (!list.isEmpty()) {
-                    return this.illager.getNavigator().tryMoveToEntityLiving(list.get(0), 0.75D);
+                if (!list.isEmpty() && this.illager.canEntityBeSeen(list.get(0))) {
+                    return this.illager.getNavigator().tryMoveToEntityLiving(list.get(0), 0.85D);
                 }
 
 
