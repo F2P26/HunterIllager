@@ -37,13 +37,15 @@ import java.util.UUID;
 
 public class BoomerangEntity extends Entity implements IProjectile {
     private static final DataParameter<Byte> LOYALTY_LEVEL = EntityDataManager.createKey(BoomerangEntity.class, DataSerializers.BYTE);
+    private static final DataParameter<Byte> PIERCING_LEVEL = EntityDataManager.createKey(BoomerangEntity.class, DataSerializers.BYTE);
     private static final DataParameter<Boolean> RETURNING = EntityDataManager.createKey(BoomerangEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<ItemStack> BOOMERANG = EntityDataManager.createKey(BoomerangEntity.class, DataSerializers.ITEMSTACK);
 
     @Nullable
     private UUID shootingEntity;
     private Vec3d throwPos;
-    private int hits;
+    private int entityHits;
+    private int totalHits;
     private int flyTick;
 
     public BoomerangEntity(EntityType<? extends BoomerangEntity> type, World world) {
@@ -55,9 +57,10 @@ public class BoomerangEntity extends Entity implements IProjectile {
         this.setShooter(shootingEntity);
         this.setBoomerang(boomerang);
         this.dataManager.set(LOYALTY_LEVEL, (byte) EnchantmentHelper.getLoyaltyModifier(boomerang));
+        this.dataManager.set(PIERCING_LEVEL, (byte) EnchantmentHelper.getEnchantmentLevel(Enchantments.PIERCING, boomerang));
         this.throwPos = new Vec3d(shootingEntity == null ? 0 : shootingEntity.posX, shootingEntity == null ? 0 : shootingEntity.posY + shootingEntity.getEyeHeight() - 0.1, shootingEntity == null ? 0 : shootingEntity.posZ);
         this.setPosition(this.throwPos.x, this.throwPos.y, this.throwPos.z);
-        this.hits = 0;
+        this.totalHits = 0;
     }
 
     public BoomerangEntity(FMLPlayMessages.SpawnEntity spawnEntity, World world) {
@@ -72,20 +75,27 @@ public class BoomerangEntity extends Entity implements IProjectile {
         if (!this.world.isRemote) {
             boolean returnToOwner = result.getType() == RayTraceResult.Type.BLOCK;
 
-            if (result.getType() == RayTraceResult.Type.BLOCK && ((BlockRayTraceResult) result).getPos() != null) {
+            if (result.getType() == RayTraceResult.Type.BLOCK) {
                 BlockPos pos = ((BlockRayTraceResult) result).getPos();
                 BlockState state = this.world.getBlockState(pos);
                 SoundType soundType = state.getSoundType(this.world, pos, this);
                 this.world.playSound(null, this.posX, this.posY, this.posZ, soundType.getHitSound(), SoundCategory.BLOCKS, soundType.getVolume() * 0.26f, soundType.getPitch());
                 //this.world.playSound(null, this.posX, this.posY, this.posZ, HunterSounds.ITEM_BOOMERANG_HIT, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                this.hits++;
+                this.totalHits++;
+
+                BlockRayTraceResult blockraytraceresult = (BlockRayTraceResult) result;
+                BlockState blockstate = this.world.getBlockState(blockraytraceresult.getPos());
+
+                blockstate.onProjectileCollision(this.world, state, blockraytraceresult, this);
+                this.doBlockCollisions();
             }
+            int loyaltyLevel = this.dataManager.get(LOYALTY_LEVEL);
+            int piercingLevel = this.dataManager.get(PIERCING_LEVEL);
 
             if (result.getType() == RayTraceResult.Type.ENTITY && ((EntityRayTraceResult) result).getEntity() != this.getShooter()) {
                 Entity shooter = this.getShooter();
                 int sharpness = EnchantmentHelper.getEnchantmentLevel(Enchantments.SHARPNESS, this.getBoomerang());
-                ((EntityRayTraceResult) result).getEntity().attackEntityFrom(DamageSource.causeThrownDamage(this, shooter), (float) (3 * Math.sqrt(this.getMotion().getX() * this.getMotion().getX() + (this.getMotion().getY() * this.getMotion().getY()) * 0.5F + this.getMotion().getZ() * this.getMotion().getZ()) + Math.min(1, sharpness) + Math.max(0, sharpness - 1) * 0.5));
-
+                ((EntityRayTraceResult) result).getEntity().attackEntityFrom(DamageSource.causeThrownDamage(this, shooter), (float) (3 * Math.sqrt(this.getMotion().getX() * this.getMotion().getX() + (this.getMotion().getY() * this.getMotion().getY()) * 0.5F + this.getMotion().getZ() * this.getMotion().getZ()) + Math.min(1, sharpness) + Math.max(0, sharpness - 1) * 0.5) + 0.5F * piercingLevel);
 
 
                 if (shooter instanceof LivingEntity) {
@@ -93,16 +103,20 @@ public class BoomerangEntity extends Entity implements IProjectile {
                     });
                 }
 
+                double velocity = this.getVelocity();
+
                 //TODO
                 //this.world.playSound(null, this.posX, this.posY, this.posZ, HunterSounds.ITEM_BOOMERANG_HIT, SoundCategory.BLOCKS, 0.5F, 1.0F);
+                if (piercingLevel < 1 || entityHits >= piercingLevel || velocity < 0.4F) {
+                    returnToOwner = true;
+                    this.totalHits += 1;
+                }
 
-                returnToOwner = true;
-                this.hits += 2;
+                this.entityHits += 1;
             }
 
-            int i = this.dataManager.get(LOYALTY_LEVEL);
 
-            if (this.isReturning() && i < 1 && this.hits >= 6) {
+            if (this.isReturning() && loyaltyLevel < 1 && this.totalHits >= 6) {
                 this.drop(this.posX, this.posY, this.posZ);
                 return;
             }
@@ -228,6 +242,7 @@ public class BoomerangEntity extends Entity implements IProjectile {
         }
         if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
             this.onHit(raytraceresult);
+            this.isAirBorne = true;
         }
 
 
@@ -265,31 +280,31 @@ public class BoomerangEntity extends Entity implements IProjectile {
             f1 = 0.8;
         }
 
-        int i = this.dataManager.get(LOYALTY_LEVEL);
+        int loyaltyLevel = this.dataManager.get(LOYALTY_LEVEL);
 
         Entity entity = this.getShooter();
 
-        if (i > 0 && !this.isReturning() && this.flyTick == 120) {
+        if (loyaltyLevel > 0 && !this.isReturning() && this.flyTick == 110) {
             if (entity != null) {
                 this.world.playSound(null, entity.getPosition(), SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1);
                 this.setReturning(true);
             }
         }
 
-        if (i > 0 && entity != null && !this.shouldReturnToThrower() && this.isReturning()) {
+        if (loyaltyLevel > 0 && entity != null && !this.shouldReturnToThrower() && this.isReturning()) {
             if (!this.world.isRemote) {
                 this.drop(this.posX, this.posY, this.posZ);
             }
 
             this.remove();
-        } else if (i > 0 && entity != null && this.isReturning()) {
+        } else if (loyaltyLevel > 0 && entity != null && this.isReturning()) {
             this.noClip = true;
             Vec3d vec3d2 = new Vec3d(entity.posX - this.posX, entity.posY + (double) entity.getEyeHeight() - this.posY, entity.posZ - this.posZ);
             if (this.world.isRemote) {
                 this.lastTickPosY = this.posY;
             }
 
-            double d0 = 0.05D * (double) i;
+            double d0 = 0.05D * (double) loyaltyLevel;
             this.setMotion(this.getMotion().scale(0.95D).add(vec3d2.normalize().scale(d0)));
         } else if (!this.hasNoGravity()) {
             this.setMotion(this.getMotion().add(0.0F, -f2, 0.0F));
@@ -330,6 +345,7 @@ public class BoomerangEntity extends Entity implements IProjectile {
     @Override
     protected void registerData() {
         this.dataManager.register(LOYALTY_LEVEL, (byte) 0);
+        this.dataManager.register(PIERCING_LEVEL, (byte) 0);
         this.dataManager.register(RETURNING, false);
         this.dataManager.register(BOOMERANG, ItemStack.EMPTY);
     }
@@ -344,7 +360,8 @@ public class BoomerangEntity extends Entity implements IProjectile {
         nbt.putDouble("throwX", this.throwPos.x);
         nbt.putDouble("throwY", this.throwPos.y);
         nbt.putDouble("throwZ", this.throwPos.z);
-        nbt.putByte("hits", (byte) this.hits);
+        nbt.putByte("entityHits", (byte) this.entityHits);
+        nbt.putByte("totalHits", (byte) this.totalHits);
         nbt.putBoolean("returning", this.isReturning());
     }
 
@@ -356,9 +373,15 @@ public class BoomerangEntity extends Entity implements IProjectile {
 
         this.setBoomerang(ItemStack.read(nbt.getCompound("boomerang")));
         this.throwPos = new Vec3d(nbt.getDouble("throwX"), nbt.getDouble("throwY"), nbt.getDouble("throwZ"));
-        this.hits = nbt.getByte("hits");
+        this.entityHits = nbt.getByte("entityHits");
+        this.totalHits = nbt.getByte("totalHits");
         this.setReturning(nbt.getBoolean("returning"));
         this.dataManager.set(LOYALTY_LEVEL, (byte) EnchantmentHelper.getLoyaltyModifier(this.getBoomerang()));
+        this.dataManager.set(PIERCING_LEVEL, (byte) EnchantmentHelper.getEnchantmentLevel(Enchantments.PIERCING, this.getBoomerang()));
+    }
+
+    protected boolean canTriggerWalking() {
+        return false;
     }
 
     private double getGravityVelocity() {
@@ -385,6 +408,10 @@ public class BoomerangEntity extends Entity implements IProjectile {
 
     public double getVelocity() {
         return Math.sqrt(this.getMotion().getX() * this.getMotion().getX() + this.getMotion().getY() * this.getMotion().getY() + this.getMotion().getZ() * this.getMotion().getZ());
+    }
+
+    public int getPiercingLevel() {
+        return this.dataManager.get(PIERCING_LEVEL);
     }
 
     public void setReturning(boolean returning) {

@@ -31,7 +31,7 @@ public class BoomerangRender extends EntityRenderer<BoomerangEntity> {
 
         GlStateManager.translated(0, (entity.getBoundingBox().maxY - entity.getBoundingBox().minY) / 2, 0);
         GlStateManager.rotatef(90, 1, 0, 0);
-        GlStateManager.rotatef((entity.ticksExisted + partialTicks) * ((float) entity.getVelocity() + 45), 0, 0, 1);
+        GlStateManager.rotatef((entity.ticksExisted + partialTicks + (entity.getPiercingLevel() * 0.1F)) * ((float) entity.getVelocity() + 45), 0, 0, 1);
         GlStateManager.scaled(0.5, 0.5, 0.5);
 
         this.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
