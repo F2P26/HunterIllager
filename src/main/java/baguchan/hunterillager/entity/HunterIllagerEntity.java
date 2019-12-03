@@ -141,9 +141,8 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
     }
 
     public ILivingEntityData onInitialSpawn(IWorld p_213386_1_, DifficultyInstance p_213386_2_, SpawnReason p_213386_3_, @Nullable ILivingEntityData p_213386_4_, @Nullable CompoundNBT p_213386_5_) {
-
-        this.setEnchantmentBasedOnDifficulty(p_213386_2_);
         this.setEquipmentBasedOnDifficulty(p_213386_2_);
+        this.setEnchantmentBasedOnDifficulty(p_213386_2_);
         this.inventory.addItem(new ItemStack(Items.PORKCHOP, 3));
         return super.onInitialSpawn(p_213386_1_, p_213386_2_, p_213386_3_, p_213386_4_, p_213386_5_);
     }
@@ -162,17 +161,11 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         float f = difficulty.getClampedAdditionalDifficulty();
         if (!this.getHeldItemMainhand().isEmpty() && this.rand.nextFloat() < 0.3F * f) {
             this.setItemStackToSlot(EquipmentSlotType.MAINHAND, EnchantmentHelper.addRandomEnchantment(this.rand, this.getHeldItemMainhand(), (int) (5.0F + f * (float) this.rand.nextInt(18)), false));
-        }
-
-        for (EquipmentSlotType equipmentslottype : EquipmentSlotType.values()) {
-            if (equipmentslottype.getSlotType() == EquipmentSlotType.Group.ARMOR) {
-                ItemStack itemstack = this.getItemStackFromSlot(equipmentslottype);
-                if (!itemstack.isEmpty() && this.rand.nextFloat() < 0.5F * f) {
-                    this.setItemStackToSlot(equipmentslottype, EnchantmentHelper.addRandomEnchantment(this.rand, itemstack, (int) (5.0F + f * (float) this.rand.nextInt(18)), false));
-                }
+        } else {
+            if (!this.getHeldItemMainhand().isEmpty() && this.rand.nextFloat() < 0.4F) {
+                this.setItemStackToSlot(EquipmentSlotType.MAINHAND, EnchantmentHelper.addRandomEnchantment(this.rand, this.getHeldItemMainhand(), (int) (5.0F + this.rand.nextInt(10)), false));
             }
         }
-
     }
 
     protected void registerData() {
