@@ -60,7 +60,7 @@ import java.util.function.Predicate;
 
 public class HunterIllagerEntity extends AbstractIllagerEntity implements IRangedAttackMob {
     private static final Predicate<ItemEntity> field_213665_b = (p_213647_0_) -> {
-        return !p_213647_0_.cannotPickup() && p_213647_0_.isAlive() && ItemStack.areItemStacksEqual(p_213647_0_.getItem(), new ItemStack(HunterItems.BOOMERANG));
+        return !p_213647_0_.cannotPickup() && p_213647_0_.isAlive() && (ItemStack.areItemStacksEqual(p_213647_0_.getItem(), new ItemStack(HunterItems.BOOMERANG)) || isFoods(p_213647_0_.getItem().getItem()));
     };
 
     private static final UUID MODIFIER_UUID = UUID.fromString("5CD17E52-A79A-43D3-A529-90FDE04B181E");
@@ -94,7 +94,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         super.registerGoals();
         this.goalSelector.addGoal(0, new SwimGoal(this));
         this.goalSelector.addGoal(1, new OpenDoorGoal(this, true));
-        this.goalSelector.addGoal(2, new HunterIllagerEntity.GetBackBoomerangGoal<>(this));
+        this.goalSelector.addGoal(2, new HunterIllagerEntity.MoveToFoodOrBoomerangGoal<>(this));
         this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.85F, false) {
             @Override
             public boolean shouldExecute() {
@@ -162,7 +162,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         if (!this.getHeldItemMainhand().isEmpty() && this.rand.nextFloat() < 0.3F * f) {
             this.setItemStackToSlot(EquipmentSlotType.MAINHAND, EnchantmentHelper.addRandomEnchantment(this.rand, this.getHeldItemMainhand(), (int) (5.0F + f * (float) this.rand.nextInt(18)), false));
         } else {
-            if (!this.getHeldItemMainhand().isEmpty() && this.rand.nextFloat() < 0.4F) {
+            if (!this.getHeldItemMainhand().isEmpty() && this.rand.nextFloat() < 0.3F) {
                 this.setItemStackToSlot(EquipmentSlotType.MAINHAND, EnchantmentHelper.addRandomEnchantment(this.rand, this.getHeldItemMainhand(), (int) (5.0F + this.rand.nextInt(10)), false));
             }
         }
@@ -260,10 +260,12 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
             } else {
                 itemstack.setCount(itemstack1.getCount());
             }
+        } else if (item == HunterItems.BOOMERANG) {
+            super.updateEquipmentIfNeeded(itemEntity);
         }
     }
 
-    private boolean isFoods(Item item) {
+    private static boolean isFoods(Item item) {
         return item.isFood() && item != Items.SPIDER_EYE && item != Items.PUFFERFISH;
     }
 
@@ -442,7 +444,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
 
         if (isHolding(Items.BOW)) {
             ItemStack itemstack = this.findAmmo(this.getHeldItem(ProjectileHelper.getHandWith(this, Items.BOW)));
-            AbstractArrowEntity abstractarrowentity = ProjectileHelper.func_221272_a(this, itemstack, distanceFactor * 1.15F);
+            AbstractArrowEntity abstractarrowentity = ProjectileHelper.fireArrow(this, itemstack, distanceFactor * 1.15F);
             if (this.getHeldItemMainhand().getItem() instanceof net.minecraft.item.BowItem)
                 abstractarrowentity = ((net.minecraft.item.BowItem) this.getHeldItemMainhand().getItem()).customeArrow(abstractarrowentity);
             double d0 = target.posX - this.posX;
@@ -530,10 +532,10 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         }
     }
 
-    public class GetBackBoomerangGoal<T extends HunterIllagerEntity> extends Goal {
+    public class MoveToFoodOrBoomerangGoal<T extends HunterIllagerEntity> extends Goal {
         private final T illager;
 
-        public GetBackBoomerangGoal(T p_i50572_2_) {
+        public MoveToFoodOrBoomerangGoal(T p_i50572_2_) {
             this.illager = p_i50572_2_;
             this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
         }
@@ -542,17 +544,14 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
          * Returns whether the EntityAIBase should begin execution.
          */
         public boolean shouldExecute() {
-            if ((this.illager.getHeldItem(Hand.MAIN_HAND).isEmpty() || this.illager.getHeldItem(Hand.MAIN_HAND).getItem() == HunterItems.BOOMERANG) && this.illager.findBoomerang().isEmpty()) {
+            if ((this.illager.getHeldItem(Hand.MAIN_HAND).isEmpty() || this.illager.getHeldItem(Hand.OFF_HAND).isEmpty())) {
                 List<ItemEntity> list = this.illager.world.getEntitiesWithinAABB(ItemEntity.class, this.illager.getBoundingBox().grow(16.0D, 8.0D, 16.0D), HunterIllagerEntity.field_213665_b);
-                if (!list.isEmpty() && this.illager.canEntityBeSeen(list.get(0))) {
+                if (!list.isEmpty()) {
                     return this.illager.getNavigator().tryMoveToEntityLiving(list.get(0), 0.85D);
                 }
-
-
-                return false;
-            } else {
-                return false;
             }
+
+            return false;
         }
 
         /**
