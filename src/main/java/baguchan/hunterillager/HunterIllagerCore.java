@@ -6,12 +6,12 @@ import baguchan.hunterillager.item.HunterItems;
 import baguchan.hunterillager.structure.FeatureRegister;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.placement.IPlacementConfig;
 import net.minecraft.world.gen.placement.Placement;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -44,9 +44,9 @@ public class HunterIllagerCore {
         MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
 
         ForgeRegistries.BIOMES.getValues().stream().forEach((biome -> {
-            biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(FeatureRegister.HUNTER_HOUSE, IFeatureConfig.NO_FEATURE_CONFIG, Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
-            if (biome.getCategory() == Biome.Category.FOREST || biome.getCategory() == Biome.Category.PLAINS) {
-                biome.addStructure(FeatureRegister.HUNTER_HOUSE, IFeatureConfig.NO_FEATURE_CONFIG);
+            biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, FeatureRegister.HUNTER_HOUSE.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).func_227228_a_(Placement.NOPE.func_227446_a_(IPlacementConfig.NO_PLACEMENT_CONFIG)));
+            if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.FOREST) || BiomeDictionary.hasType(biome, BiomeDictionary.Type.PLAINS)) {
+                biome.addStructure(FeatureRegister.HUNTER_HOUSE.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG));
             }
         }));
     }

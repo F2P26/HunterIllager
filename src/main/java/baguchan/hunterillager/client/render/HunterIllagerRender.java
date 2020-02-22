@@ -4,6 +4,8 @@ import baguchan.hunterillager.HunterIllagerCore;
 import baguchan.hunterillager.client.model.HunterIllagerModel;
 import baguchan.hunterillager.client.render.layer.CrossArmHeldItemLayer;
 import baguchan.hunterillager.entity.HunterIllagerEntity;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.layers.HeadLayer;
@@ -21,11 +23,11 @@ public class HunterIllagerRender<T extends HunterIllagerEntity> extends MobRende
         this.addLayer(new HeadLayer<>(this));
         this.addLayer(new CrossArmHeldItemLayer(this));
         this.addLayer(new HeldItemLayer<T, HunterIllagerModel<T>>(this) {
-            public void render(T p_212842_1_, float p_212842_2_, float p_212842_3_, float p_212842_4_, float p_212842_5_, float p_212842_6_, float p_212842_7_, float p_212842_8_) {
-                if ( p_212842_1_.isAggressive()) {
-                    super.render(p_212842_1_, p_212842_2_, p_212842_3_, p_212842_4_, p_212842_5_, p_212842_6_, p_212842_7_, p_212842_8_);
+            @Override
+            public void render(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, T entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+                if (entitylivingbaseIn.isAggressive()) {
+                    super.render(matrixStackIn, bufferIn, packedLightIn, entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
                 }
-
             }
         });
     }
@@ -33,7 +35,7 @@ public class HunterIllagerRender<T extends HunterIllagerEntity> extends MobRende
     /**
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
-    protected ResourceLocation getEntityTexture(HunterIllagerEntity entity) {
+    public ResourceLocation getEntityTexture(HunterIllagerEntity entity) {
         return ILLAGER;
     }
 }

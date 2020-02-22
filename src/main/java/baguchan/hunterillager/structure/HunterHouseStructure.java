@@ -10,6 +10,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.OverworldGenSettings;
 import net.minecraft.world.gen.feature.Feature;
@@ -44,15 +45,16 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
         return new ChunkPos(k1, l1);
     }
 
-    public boolean hasStartAt(ChunkGenerator<?> chunkGen, Random rand, int chunkPosX, int chunkPosZ) {
+    @Override
+    public boolean func_225558_a_(BiomeManager p_225558_1_, ChunkGenerator<?> chunkGen, Random rand, int chunkPosX, int chunkPosZ, Biome p_225558_6_) {
         ChunkPos chunkpos = this.getStartPositionForPosition(chunkGen, rand, chunkPosX, chunkPosZ, 0, 0);
         if (chunkGen.getSettings() instanceof OverworldGenSettings) {
             if (chunkPosX == chunkpos.x && chunkPosZ == chunkpos.z) {
-                Biome biome = chunkGen.getBiomeProvider().getBiome(new BlockPos(chunkPosX * 16 + 9, 0, chunkPosZ * 16 + 9));
+                Biome biome = chunkGen.getBiomeProvider().getNoiseBiome(chunkPosX * 16 + 9, 0, chunkPosZ * 16 + 9);
                 if (chunkGen.hasStructure(biome, FeatureRegister.HUNTER_HOUSE)) {
                     for (int k = chunkPosX - 10; k <= chunkPosX + 10; ++k) {
                         for (int l = chunkPosZ - 10; l <= chunkPosZ + 10; ++l) {
-                            if (Feature.VILLAGE.hasStartAt(chunkGen, rand, k, l)) {
+                            if (Feature.VILLAGE.func_225558_a_(p_225558_1_, chunkGen, rand, k, l, p_225558_6_)) {
                                 return false;
                             }
                         }
@@ -62,6 +64,12 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
                 }
             }
         }
+
+        return false;
+    }
+
+    public boolean hasStartAt(ChunkGenerator<?> chunkGen, Random rand, int chunkPosX, int chunkPosZ) {
+
 
         return false;
 
@@ -92,8 +100,8 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
     }
 
     public static class Start extends StructureStart {
-        public Start(Structure<?> p_i50460_1_, int p_i50460_2_, int p_i50460_3_, Biome p_i50460_4_, MutableBoundingBox p_i50460_5_, int p_i50460_6_, long p_i50460_7_) {
-            super(p_i50460_1_, p_i50460_2_, p_i50460_3_, p_i50460_4_, p_i50460_5_, p_i50460_6_, p_i50460_7_);
+        public Start(Structure<?> p_i50460_1_, int p_i50460_2_, int p_i50460_3_, MutableBoundingBox p_i50460_5_, int p_i50460_6_, long p_i50460_7_) {
+            super(p_i50460_1_, p_i50460_2_, p_i50460_3_, p_i50460_5_, p_i50460_6_, p_i50460_7_);
         }
 
         public void init(ChunkGenerator<?> generator, TemplateManager templateManagerIn, int chunkX, int chunkZ, Biome biomeIn) {
@@ -104,8 +112,8 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
             this.recalculateStructureSize();
         }
 
-        public void generateStructure(IWorld worldIn, Random rand, MutableBoundingBox structurebb, ChunkPos pos) {
-            super.generateStructure(worldIn, rand, structurebb, pos);
+        public void func_225565_a_(IWorld worldIn, ChunkGenerator<?> chunkGenerator, Random rand, MutableBoundingBox structurebb, ChunkPos pos) {
+            super.func_225565_a_(worldIn, chunkGenerator, rand, structurebb, pos);
             int i = this.bounds.minY;
 
             for (int j = structurebb.minX; j <= structurebb.maxX; ++j) {

@@ -29,7 +29,7 @@ public class GotoBedGoal extends MoveToBlockGoal {
     public boolean shouldContinueExecuting() {
         BlockPos blockpos = new BlockPos(destinationBlock.getX(), destinationBlock.getY(), destinationBlock.getZ());
 
-        return !this.illager.world.isDaytime() && this.illager.getRaid() == null && (illager.posY > (double) blockpos.getY() + 0.4D && blockpos.withinDistance(illager.getPositionVec(), 1.14D) && this.illager.isSleeping() && this.illager.getBedPosition().isPresent());
+        return !this.illager.world.isDaytime() && this.illager.getRaid() == null && (illager.getPosY() > (double) blockpos.getY() + 0.4D && blockpos.withinDistance(illager.getPositionVec(), 1.14D) && this.illager.isSleeping() && this.illager.getBedPosition().isPresent());
     }
 
 

@@ -15,7 +15,7 @@ public class WakeUpGoal extends Goal {
         if (this.illager.world.isDaytime()) {
             return this.illager.isSleeping();
         } else {
-            return this.illager.isSleeping() && (illager.posY < (double) this.illager.getBedPosition().get().getY() + 0.4D || this.illager.isSleeping() && !this.illager.getBedPosition().get().withinDistance(illager.getPositionVec(), 1.14D) || !this.illager.getBedPosition().isPresent());
+            return this.illager.isSleeping() && (illager.getPosY() < (double) this.illager.getBedPosition().get().getY() + 0.4D || this.illager.isSleeping() && !this.illager.getBedPosition().get().withinDistance(illager.getPositionVec(), 1.14D) || !this.illager.getBedPosition().isPresent());
         }
     }
 

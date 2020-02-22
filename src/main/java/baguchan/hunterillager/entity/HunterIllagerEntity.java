@@ -316,7 +316,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
                     }
                     this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(MODIFIER);
                 } else if (this.foodUseTimer >= 0 && this.ticksExisted % 4 == 0) {
-                    this.world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_GENERIC_EAT, this.getSoundCategory(), 1.0F, 0.8F + this.rand.nextFloat() * 0.4F);
+                    this.world.playSound(null, this.getPosX(), this.getPosY(), this.getPosZ(), SoundEvents.ENTITY_GENERIC_EAT, this.getSoundCategory(), 1.0F, 0.8F + this.rand.nextFloat() * 0.4F);
                 }
             } else {
                 if (this.rand.nextFloat() < 0.005F && this.getHealth() < this.getMaxHealth()) {
@@ -447,9 +447,9 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
             AbstractArrowEntity abstractarrowentity = ProjectileHelper.fireArrow(this, itemstack, distanceFactor * 1.15F);
             if (this.getHeldItemMainhand().getItem() instanceof net.minecraft.item.BowItem)
                 abstractarrowentity = ((net.minecraft.item.BowItem) this.getHeldItemMainhand().getItem()).customeArrow(abstractarrowentity);
-            double d0 = target.posX - this.posX;
-            double d1 = target.getBoundingBox().minY + (double) (target.getHeight() / 3.0F) - abstractarrowentity.posY;
-            double d2 = target.posZ - this.posZ;
+            double d0 = target.getPosX() - this.getPosX();
+            double d1 = target.getBoundingBox().minY + (double) (target.getHeight() / 3.0F) - abstractarrowentity.getPosY();
+            double d2 = target.getPosZ() - this.getPosZ();
             double d3 = (double) MathHelper.sqrt(d0 * d0 + d2 * d2);
             abstractarrowentity.shoot(d0, d1 + d3 * (double) 0.2F, d2, 1.6F, (float) (10 - this.world.getDifficulty().getId() * 4));
             this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRNG().nextFloat() * 0.4F + 0.8F));
@@ -517,8 +517,8 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
             BlockPos blockpos = this.hunterIllager.getMainHome();
             if (blockpos != null && HunterIllagerEntity.this.navigator.noPath()) {
                 if (this.func_220846_a(blockpos, 10.0D)) {
-                    Vec3d vec3d = (new Vec3d((double) blockpos.getX() - this.hunterIllager.posX, (double) blockpos.getY() - this.hunterIllager.posY, (double) blockpos.getZ() - this.hunterIllager.posZ)).normalize();
-                    Vec3d vec3d1 = vec3d.scale(10.0D).add(this.hunterIllager.posX, this.hunterIllager.posY, this.hunterIllager.posZ);
+                    Vec3d vec3d = (new Vec3d((double) blockpos.getX() - this.hunterIllager.getPosX(), (double) blockpos.getY() - this.hunterIllager.getPosY(), (double) blockpos.getZ() - this.hunterIllager.getPosZ())).normalize();
+                    Vec3d vec3d1 = vec3d.scale(10.0D).add(this.hunterIllager.getPosX(), this.hunterIllager.getPosY(), this.hunterIllager.getPosZ());
                     HunterIllagerEntity.this.navigator.tryMoveToXYZ(vec3d1.x, vec3d1.y, vec3d1.z, this.speed);
                 } else {
                     HunterIllagerEntity.this.navigator.tryMoveToXYZ((double) blockpos.getX(), (double) blockpos.getY(), (double) blockpos.getZ(), this.speed);

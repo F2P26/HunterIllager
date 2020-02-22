@@ -42,7 +42,7 @@ public class BoomerangItem extends Item {
             world.addEntity(projectile);
             //world.playSound(null, entity.posX, entity.posY, entity.posZ, HunterSounds.ITEM_BOOMERANG_THROW, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
-            world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvents.ENTITY_EGG_THROW, SoundCategory.PLAYERS, 1.0f, 1.0f);
+            world.playSound(null, entity.getPosX(), entity.getPosY(), entity.getPosZ(), SoundEvents.ENTITY_EGG_THROW, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
             if (!(entity instanceof PlayerEntity) || !((PlayerEntity) entity).isCreative()) {
                 stack.shrink(1);

@@ -1,12 +1,16 @@
 package baguchan.hunterillager.client.render;
 
 import baguchan.hunterillager.entity.projectile.BoomerangEntity;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -22,40 +26,19 @@ public class BoomerangRender extends EntityRenderer<BoomerangEntity> {
     }
 
     @Override
-    public void doRender(BoomerangEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
-        super.doRender(entity, x, y, z, entityYaw, partialTicks);
+    public void render(BoomerangEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+        matrixStackIn.push();
+        matrixStackIn.translate(0, (entityIn.getBoundingBox().maxY - entityIn.getBoundingBox().minY) / 2, 0);
+        matrixStackIn.rotate(Vector3f.XP.rotationDegrees(90.0F));
+        matrixStackIn.rotate(Vector3f.ZP.rotationDegrees((entityIn.ticksExisted + partialTicks + (entityIn.getPiercingLevel() * 0.85F)) * ((float) entityIn.getVelocity() + 45)));
+        this.itemRenderer.renderItem(entityIn.getBoomerang(), ItemCameraTransforms.TransformType.GROUND, packedLightIn, OverlayTexture.DEFAULT_LIGHT, matrixStackIn, bufferIn);
+        matrixStackIn.pop();
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translated(x, y, z);
-        GlStateManager.enableRescaleNormal();
-
-        GlStateManager.translated(0, (entity.getBoundingBox().maxY - entity.getBoundingBox().minY) / 2, 0);
-        GlStateManager.rotatef(90, 1, 0, 0);
-        GlStateManager.rotatef((entity.ticksExisted + partialTicks + (entity.getPiercingLevel() * 0.85F)) * ((float) entity.getVelocity() + 45), 0, 0, 1);
-        GlStateManager.scaled(0.5, 0.5, 0.5);
-
-        this.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
-        if (this.renderOutlines) {
-            GlStateManager.enableColorMaterial();
-            GlStateManager.setupSolidRenderingTextureCombine(this.getTeamColor(entity));
-        }
-
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        this.itemRenderer.renderItem(entity.getBoomerang(), this.itemRenderer.getModelWithOverrides(entity.getBoomerang()));
-        GlStateManager.disableBlend();
-
-        if (this.renderOutlines) {
-            GlStateManager.tearDownSolidRenderingTextureCombine();
-            GlStateManager.disableColorMaterial();
-        }
-
-        GlStateManager.disableRescaleNormal();
-        GlStateManager.popMatrix();
+        super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     @Override
-    protected ResourceLocation getEntityTexture(BoomerangEntity entity) {
+    public ResourceLocation getEntityTexture(BoomerangEntity entity) {
         return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
     }
 }
