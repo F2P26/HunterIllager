@@ -31,7 +31,7 @@ public class BoomerangRender extends EntityRenderer<BoomerangEntity> {
         matrixStackIn.translate(0, (entityIn.getBoundingBox().maxY - entityIn.getBoundingBox().minY) / 2, 0);
         matrixStackIn.rotate(Vector3f.XP.rotationDegrees(90.0F));
         matrixStackIn.rotate(Vector3f.ZP.rotationDegrees((entityIn.ticksExisted + partialTicks + (entityIn.getPiercingLevel() * 0.85F)) * ((float) entityIn.getVelocity() + 45)));
-        this.itemRenderer.renderItem(entityIn.getBoomerang(), ItemCameraTransforms.TransformType.GROUND, packedLightIn, OverlayTexture.DEFAULT_LIGHT, matrixStackIn, bufferIn);
+        this.itemRenderer.renderItem(entityIn.getBoomerang(), ItemCameraTransforms.TransformType.GROUND, packedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, bufferIn);
         matrixStackIn.pop();
 
         super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);

@@ -1,7 +1,7 @@
-package baguchan.hunterillager.item;
+package baguchan.hunterillager.init;
 
-import baguchan.hunterillager.HunterEntityRegistry;
 import baguchan.hunterillager.HunterIllagerCore;
+import baguchan.hunterillager.item.BoomerangItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.SpawnEggItem;

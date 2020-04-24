@@ -1,8 +1,8 @@
 package baguchan.hunterillager.structure;
 
-import baguchan.hunterillager.HunterEntityRegistry;
 import baguchan.hunterillager.HunterIllagerCore;
 import baguchan.hunterillager.entity.HunterIllagerEntity;
+import baguchan.hunterillager.init.HunterEntityRegistry;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.ILivingEntityData;

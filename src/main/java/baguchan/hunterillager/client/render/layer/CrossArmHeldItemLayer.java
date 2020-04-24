@@ -32,7 +32,7 @@ public class CrossArmHeldItemLayer<T extends HunterIllagerEntity> extends LayerR
                     matrixStackIn.scale(0.5F, 0.5F, 0.5F);
                 }
 
-                this.getEntityModel().crossHand.setAnglesAndRotation(matrixStackIn);
+                this.getEntityModel().crossHand.translateRotate(matrixStackIn);
                 matrixStackIn.translate(-0.0625F, 0.53125F, 0.21875F);
                 Item item = itemstack.getItem();
                 if (Block.getBlockFromItem(item).getDefaultState().getRenderType() == BlockRenderType.ENTITYBLOCK_ANIMATED) {
@@ -57,13 +57,5 @@ public class CrossArmHeldItemLayer<T extends HunterIllagerEntity> extends LayerR
                 matrixStackIn.pop();
             }
         }
-    }
-
-    public void render(T p_212842_1_, float p_212842_2_, float p_212842_3_, float p_212842_4_, float p_212842_5_, float p_212842_6_, float p_212842_7_, float p_212842_8_) {
-
-    }
-
-    public boolean shouldCombineTextures() {
-        return false;
     }
 }

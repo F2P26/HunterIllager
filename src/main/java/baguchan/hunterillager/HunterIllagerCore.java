@@ -2,7 +2,8 @@ package baguchan.hunterillager;
 
 import baguchan.hunterillager.client.HunterRenderingRegistry;
 import baguchan.hunterillager.event.EntityEventHandler;
-import baguchan.hunterillager.item.HunterItems;
+import baguchan.hunterillager.init.HunterEntityRegistry;
+import baguchan.hunterillager.init.HunterItems;
 import baguchan.hunterillager.structure.FeatureRegister;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
@@ -44,10 +45,19 @@ public class HunterIllagerCore {
         MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
 
         ForgeRegistries.BIOMES.getValues().stream().forEach((biome -> {
-            biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, FeatureRegister.HUNTER_HOUSE.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).func_227228_a_(Placement.NOPE.func_227446_a_(IPlacementConfig.NO_PLACEMENT_CONFIG)));
-            if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.FOREST) || BiomeDictionary.hasType(biome, BiomeDictionary.Type.PLAINS)) {
+            biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, FeatureRegister.HUNTER_HOUSE.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG)));
+            if (!BiomeDictionary.hasType(biome, BiomeDictionary.Type.NETHER)
+                    && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.END)
+                    && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.VOID)
+                    && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.OCEAN)
+                    && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.RIVER)
+                    && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.MUSHROOM)
+                    && (biome.getRegistryName().getNamespace().equals("minecraft")
+                    || biome.getRegistryName().getNamespace().equals("midnight")
+                    || biome.getRegistryName().getNamespace().equals("biomesoplenty")
+                    || biome.getRegistryName().getNamespace().equals("terraforged"))
+            )
                 biome.addStructure(FeatureRegister.HUNTER_HOUSE.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG));
-            }
         }));
     }
 

@@ -16,7 +16,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class HunterIllagerRender<T extends HunterIllagerEntity> extends MobRenderer<T, HunterIllagerModel<T>> {
-    private static final ResourceLocation ILLAGER = new ResourceLocation(HunterIllagerCore.MODID, "textures/entity/illager/hunter_illager.png");
+    private static final ResourceLocation ILLAGER = new ResourceLocation(HunterIllagerCore.MODID, "textures/entity/hunter_illager/hunter_illager_plain.png");
 
     public HunterIllagerRender(EntityRendererManager p_i47477_1_) {
         super(p_i47477_1_, new HunterIllagerModel<>(), 0.5F);
@@ -36,6 +36,10 @@ public class HunterIllagerRender<T extends HunterIllagerEntity> extends MobRende
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
     public ResourceLocation getEntityTexture(HunterIllagerEntity entity) {
-        return ILLAGER;
+        if (entity.getHunterType() != null) {
+            return new ResourceLocation(entity.getHunterType().getRegistryName().getNamespace(), "textures/entity/hunter_illager/hunter_illager_" + entity.getHunterType().getRegistryName().getPath() + ".png");
+        } else {
+            return ILLAGER;
+        }
     }
 }

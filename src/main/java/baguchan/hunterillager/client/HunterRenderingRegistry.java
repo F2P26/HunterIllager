@@ -1,8 +1,8 @@
 package baguchan.hunterillager.client;
 
-import baguchan.hunterillager.HunterEntityRegistry;
 import baguchan.hunterillager.client.render.BoomerangRender;
 import baguchan.hunterillager.client.render.HunterIllagerRender;
+import baguchan.hunterillager.init.HunterEntityRegistry;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;

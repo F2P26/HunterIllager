@@ -1,5 +1,6 @@
-package baguchan.hunterillager;
+package baguchan.hunterillager.init;
 
+import baguchan.hunterillager.HunterIllagerCore;
 import baguchan.hunterillager.entity.HunterIllagerEntity;
 import baguchan.hunterillager.entity.projectile.BoomerangEntity;
 import net.minecraft.entity.EntityClassification;

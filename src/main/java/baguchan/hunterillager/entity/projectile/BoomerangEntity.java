@@ -1,6 +1,6 @@
 package baguchan.hunterillager.entity.projectile;
 
-import baguchan.hunterillager.HunterEntityRegistry;
+import baguchan.hunterillager.init.HunterEntityRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;

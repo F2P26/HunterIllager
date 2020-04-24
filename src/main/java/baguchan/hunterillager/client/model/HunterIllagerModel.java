@@ -84,9 +84,8 @@ public class HunterIllagerModel<T extends HunterIllagerEntity> extends Segmented
     public Iterable<ModelRenderer> getParts() {
         return ImmutableList.of(this.body, this.body2, this.head, this.rightLeg, this.leftLeg, this.rightHand, this.leftHand, this.crossHand, this.crossRightHand, this.quivers);
     }
-
     @Override
-    public void render(T abstractillager, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setRotationAngles(T abstractillager, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         if (abstractillager.getArmPose() == AbstractIllagerEntity.ArmPose.CROSSED)
         {
             this.rightHand.showModel = false;
@@ -172,6 +171,6 @@ public class HunterIllagerModel<T extends HunterIllagerEntity> extends Segmented
 
     @Override
     public void translateHand(HandSide sideIn, MatrixStack matrixStackIn) {
-        getArm(sideIn).setAnglesAndRotation(matrixStackIn);
+        getArm(sideIn).translateRotate(matrixStackIn);
     }
 }

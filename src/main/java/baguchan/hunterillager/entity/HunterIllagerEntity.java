@@ -6,8 +6,11 @@ import baguchan.hunterillager.entity.ai.GotoBedGoal;
 import baguchan.hunterillager.entity.ai.RangedAggroedAttackGoal;
 import baguchan.hunterillager.entity.ai.WakeUpGoal;
 import baguchan.hunterillager.entity.projectile.BoomerangEntity;
+import baguchan.hunterillager.huntertype.HunterType;
+import baguchan.hunterillager.huntertype.HunterTypeUtils;
+import baguchan.hunterillager.init.HunterItems;
+import baguchan.hunterillager.init.HunterTypes;
 import baguchan.hunterillager.item.BoomerangItem;
-import baguchan.hunterillager.item.HunterItems;
 import com.google.common.collect.Maps;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -50,6 +53,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.raid.Raid;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.BiomeDictionary;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
@@ -66,6 +70,8 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
     private static final UUID MODIFIER_UUID = UUID.fromString("5CD17E52-A79A-43D3-A529-90FDE04B181E");
     private static final AttributeModifier MODIFIER = (new AttributeModifier(MODIFIER_UUID, "Drinking speed penalty", -0.25D, AttributeModifier.Operation.ADDITION)).setSaved(false);
     private static final DataParameter<Boolean> IS_EATING = EntityDataManager.createKey(HunterIllagerEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<String> TYPE = EntityDataManager.createKey(HunterIllagerEntity.class, DataSerializers.STRING);
+
     private int foodUseTimer;
     @Nullable
     private BlockPos homePosition;
@@ -144,6 +150,10 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         this.setEquipmentBasedOnDifficulty(p_213386_2_);
         this.setEnchantmentBasedOnDifficulty(p_213386_2_);
         this.inventory.addItem(new ItemStack(Items.PORKCHOP, 3));
+
+        if (BiomeDictionary.hasType(p_213386_1_.getBiome(new BlockPos(this)), BiomeDictionary.Type.SNOWY)) {
+            this.setHunterType(HunterTypes.SNOW);
+        }
         return super.onInitialSpawn(p_213386_1_, p_213386_2_, p_213386_3_, p_213386_4_, p_213386_5_);
     }
 
@@ -171,6 +181,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
     protected void registerData() {
         super.registerData();
         this.getDataManager().register(IS_EATING, false);
+        this.getDataManager().register(TYPE, HunterTypes.PLAIN.getRegistryName().toString());
     }
 
     @Override
@@ -182,7 +193,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
             i = 2;
         }
 
-        boolean flag = this.rand.nextFloat() <= raid.func_221308_w();
+        boolean flag = this.rand.nextFloat() <= raid.getEnchantOdds();
         boolean flag3 = this.rand.nextFloat() <= 0.2;
         if (flag) {
             Map<Enchantment, Integer> map = Maps.newHashMap();
@@ -204,6 +215,8 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         if (this.homePosition != null) {
             compound.put("HomeTarget", NBTUtil.writeBlockPos(this.homePosition));
         }
+
+        HunterTypeUtils.setHunterType(compound, this.getHunterType());
 
         compound.putInt("CooldownTicks", this.cooldownTicks);
 
@@ -228,6 +241,12 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
 
         if (compound.contains("HomeTarget")) {
             this.homePosition = NBTUtil.readBlockPos(compound.getCompound("HomeTarget"));
+        }
+
+        if (compound.contains("HunterType")) {
+            this.setHunterType(HunterTypeUtils.getHunterTypeFromNBT(compound));
+        } else {
+            this.setHunterType(HunterTypes.PLAIN);
         }
 
         this.cooldownTicks = compound.getInt("CooldownTicks");
@@ -274,10 +293,17 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         this.homePosition = p_213726_1_;
     }
 
-
     @Nullable
     public BlockPos getMainHome() {
         return this.homePosition;
+    }
+
+    public void setHunterType(HunterType hunterType) {
+        this.getDataManager().set(TYPE, hunterType.getRegistryName().toString());
+    }
+
+    public HunterType getHunterType() {
+        return HunterTypeUtils.getHunterFromString(this.getDataManager().get(TYPE));
     }
 
     public boolean isCooldown() {

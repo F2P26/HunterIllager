@@ -12,7 +12,6 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.OverworldGenSettings;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.gen.feature.structure.Structure;
@@ -48,31 +47,22 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
     @Override
     public boolean func_225558_a_(BiomeManager p_225558_1_, ChunkGenerator<?> chunkGen, Random rand, int chunkPosX, int chunkPosZ, Biome p_225558_6_) {
         ChunkPos chunkpos = this.getStartPositionForPosition(chunkGen, rand, chunkPosX, chunkPosZ, 0, 0);
-        if (chunkGen.getSettings() instanceof OverworldGenSettings) {
-            if (chunkPosX == chunkpos.x && chunkPosZ == chunkpos.z) {
-                Biome biome = chunkGen.getBiomeProvider().getNoiseBiome(chunkPosX * 16 + 9, 0, chunkPosZ * 16 + 9);
-                if (chunkGen.hasStructure(biome, FeatureRegister.HUNTER_HOUSE)) {
-                    for (int k = chunkPosX - 10; k <= chunkPosX + 10; ++k) {
-                        for (int l = chunkPosZ - 10; l <= chunkPosZ + 10; ++l) {
-                            if (Feature.VILLAGE.func_225558_a_(p_225558_1_, chunkGen, rand, k, l, p_225558_6_)) {
-                                return false;
-                            }
+        if (chunkPosX == chunkpos.x && chunkPosZ == chunkpos.z) {
+            Biome biome = chunkGen.getBiomeProvider().getNoiseBiome(chunkPosX * 16 + 9, 0, chunkPosZ * 16 + 9);
+            if (chunkGen.hasStructure(biome, FeatureRegister.HUNTER_HOUSE)) {
+                for (int k = chunkPosX - 10; k <= chunkPosX + 10; ++k) {
+                    for (int l = chunkPosZ - 10; l <= chunkPosZ + 10; ++l) {
+                        if (Feature.VILLAGE.func_225558_a_(p_225558_1_, chunkGen, rand, k, l, p_225558_6_)) {
+                            return false;
                         }
                     }
-
-                    return true;
                 }
+
+                return true;
             }
         }
 
         return false;
-    }
-
-    public boolean hasStartAt(ChunkGenerator<?> chunkGen, Random rand, int chunkPosX, int chunkPosZ) {
-
-
-        return false;
-
     }
 
     public String getStructureName() {
@@ -92,11 +82,11 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
     }
 
     protected int getBiomeFeatureDistance(ChunkGenerator<?> chunkGenerator) {
-        return 26;
+        return 24;
     }
 
     protected int getBiomeFeatureSeparation(ChunkGenerator<?> chunkGenerator) {
-        return 6;
+        return 3;
     }
 
     public static class Start extends StructureStart {
