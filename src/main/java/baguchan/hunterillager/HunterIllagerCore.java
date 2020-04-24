@@ -45,7 +45,6 @@ public class HunterIllagerCore {
         MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
 
         ForgeRegistries.BIOMES.getValues().stream().forEach((biome -> {
-            biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, FeatureRegister.HUNTER_HOUSE.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG)));
             if (!BiomeDictionary.hasType(biome, BiomeDictionary.Type.NETHER)
                     && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.END)
                     && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.VOID)
@@ -56,8 +55,11 @@ public class HunterIllagerCore {
                     || biome.getRegistryName().getNamespace().equals("midnight")
                     || biome.getRegistryName().getNamespace().equals("biomesoplenty")
                     || biome.getRegistryName().getNamespace().equals("terraforged"))
-            )
+            ) {
                 biome.addStructure(FeatureRegister.HUNTER_HOUSE.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG));
+            }
+
+            biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, FeatureRegister.HUNTER_HOUSE.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG)));
         }));
     }
 
