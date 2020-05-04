@@ -48,8 +48,7 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
     public boolean func_225558_a_(BiomeManager p_225558_1_, ChunkGenerator<?> chunkGen, Random rand, int chunkPosX, int chunkPosZ, Biome p_225558_6_) {
         ChunkPos chunkpos = this.getStartPositionForPosition(chunkGen, rand, chunkPosX, chunkPosZ, 0, 0);
         if (chunkPosX == chunkpos.x && chunkPosZ == chunkpos.z) {
-            Biome biome = chunkGen.getBiomeProvider().getNoiseBiome(chunkPosX * 16 + 9, 0, chunkPosZ * 16 + 9);
-            if (chunkGen.hasStructure(biome, FeatureRegister.HUNTER_HOUSE)) {
+            if (chunkGen.hasStructure(p_225558_6_, FeatureRegister.HUNTER_HOUSE)) {
                 for (int k = chunkPosX - 10; k <= chunkPosX + 10; ++k) {
                     for (int l = chunkPosZ - 10; l <= chunkPosZ + 10; ++l) {
                         if (Feature.VILLAGE.func_225558_a_(p_225558_1_, chunkGen, rand, k, l, p_225558_6_)) {

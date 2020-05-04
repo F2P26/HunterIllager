@@ -26,7 +26,7 @@ import net.minecraft.entity.monster.AbstractRaiderEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.passive.horse.HorseEntity;
+import net.minecraft.entity.passive.horse.AbstractHorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
@@ -80,7 +80,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
 
     public static final Predicate<LivingEntity> animalTarget = (p_213440_0_) -> {
         EntityType<?> entitytype = p_213440_0_.getType();
-        return entitytype != EntityType.CAT && entitytype != EntityType.FOX && !(p_213440_0_ instanceof TameableEntity) && !(p_213440_0_ instanceof HorseEntity) || entitytype == EntityType.SNOW_GOLEM;
+        return entitytype != EntityType.CAT && entitytype != EntityType.FOX && entitytype != EntityType.BEE && entitytype != EntityType.PANDA && !(p_213440_0_ instanceof TameableEntity) && !(p_213440_0_ instanceof AbstractHorseEntity) || entitytype == EntityType.SNOW_GOLEM;
     };
 
     protected int eattick = 0;

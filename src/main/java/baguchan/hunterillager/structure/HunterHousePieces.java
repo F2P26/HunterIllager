@@ -16,7 +16,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.DarkForestBiome;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.feature.structure.StructurePiece;
@@ -25,28 +24,29 @@ import net.minecraft.world.gen.feature.template.BlockIgnoreStructureProcessor;
 import net.minecraft.world.gen.feature.template.PlacementSettings;
 import net.minecraft.world.gen.feature.template.Template;
 import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraftforge.common.BiomeDictionary;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 public class HunterHousePieces {
-    private static final ResourceLocation campbaseTemplate = new ResourceLocation(HunterIllagerCore.MODID, "illager_campbase");
+    private static final ResourceLocation crafthut = new ResourceLocation(HunterIllagerCore.MODID, "illager_crafthouse");
 
-    private static final ResourceLocation woodhutTemplate = new ResourceLocation(HunterIllagerCore.MODID, "illager_woodhut");
-    private static final ResourceLocation darkWoodhutTemplate = new ResourceLocation(HunterIllagerCore.MODID, "illager_darkwoodhut");
+    private static final ResourceLocation hunterbase_Template = new ResourceLocation(HunterIllagerCore.MODID, "illager_woodhut");
+    private static final ResourceLocation snowny_hunterbase_Template = new ResourceLocation(HunterIllagerCore.MODID, "illager_woodhut_snow");
 
-    private static final Map<ResourceLocation, BlockPos> structurePos = ImmutableMap.of(campbaseTemplate, BlockPos.ZERO, woodhutTemplate, new BlockPos(5, 0, 4), darkWoodhutTemplate, new BlockPos(5, 0, 4));
+    private static final Map<ResourceLocation, BlockPos> structurePos = ImmutableMap.of(crafthut, new BlockPos(12, 0, 8), hunterbase_Template, BlockPos.ZERO, snowny_hunterbase_Template, BlockPos.ZERO);
 
     public static void addStructure(TemplateManager p_207617_0_, BlockPos p_207617_1_, Rotation p_207617_2_, List<StructurePiece> p_207617_3_, Random p_207617_4_, Biome biome) {
-        if (p_207617_4_.nextDouble() < 0.5D) {
-            if (biome instanceof DarkForestBiome) {
-                p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, darkWoodhutTemplate, p_207617_1_, p_207617_2_, 0));
-            } else {
-                p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, woodhutTemplate, p_207617_1_, p_207617_2_, 0));
-            }
+
+        if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.SNOWY)) {
+            p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, snowny_hunterbase_Template, p_207617_1_, p_207617_2_, 0));
+        } else {
+            p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, hunterbase_Template, p_207617_1_, p_207617_2_, 0));
         }
-        p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, campbaseTemplate, p_207617_1_, p_207617_2_, 0));
+
+        p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, crafthut, p_207617_1_, p_207617_2_, 0));
     }
 
 
@@ -72,7 +72,7 @@ public class HunterHousePieces {
 
         private void func_207614_a(TemplateManager p_207614_1_) {
             Template template = p_207614_1_.getTemplateDefaulted(this.field_207615_d);
-            PlacementSettings placementsettings = (new PlacementSettings()).setRotation(this.field_207616_e).setMirror(Mirror.NONE).setCenterOffset(HunterHousePieces.structurePos.get(this.field_207615_d)).addProcessor(BlockIgnoreStructureProcessor.STRUCTURE_BLOCK);
+            PlacementSettings placementsettings = (new PlacementSettings()).setRotation(this.field_207616_e).setMirror(Mirror.NONE).addProcessor(BlockIgnoreStructureProcessor.STRUCTURE_BLOCK);
             this.setup(template, this.templatePosition, placementsettings);
         }
 
@@ -102,9 +102,9 @@ public class HunterHousePieces {
          * the end, it adds Fences...
          */
         public boolean func_225577_a_(IWorld worldIn, ChunkGenerator<?> chunkGenerator, Random randomIn, MutableBoundingBox structureBoundingBoxIn, ChunkPos p_74875_4_) {
-            PlacementSettings placementsettings = (new PlacementSettings()).setRotation(this.field_207616_e).setMirror(Mirror.NONE).setCenterOffset(HunterHousePieces.structurePos.get(this.field_207615_d)).addProcessor(BlockIgnoreStructureProcessor.STRUCTURE_BLOCK);
-            BlockPos blockpos = HunterHousePieces.structurePos.get(this.field_207615_d);
-            BlockPos blockpos1 = this.templatePosition.add(Template.transformedBlockPos(placementsettings, new BlockPos(3 - blockpos.getX(), 0, 0 - blockpos.getZ())));
+            BlockPos blockpos = this.template.getSize();
+
+            BlockPos blockpos1 = this.templatePosition;
             int i = worldIn.getHeight(Heightmap.Type.WORLD_SURFACE_WG, blockpos1.getX(), blockpos1.getZ());
             BlockPos blockpos2 = this.templatePosition;
             this.templatePosition = this.templatePosition.add(0, i - 90 - 1, 0);

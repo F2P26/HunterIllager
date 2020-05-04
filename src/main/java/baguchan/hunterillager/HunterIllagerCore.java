@@ -16,6 +16,7 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -44,22 +45,30 @@ public class HunterIllagerCore {
     private void setup(final FMLCommonSetupEvent event) {
         MinecraftForge.EVENT_BUS.register(new EntityEventHandler());
 
+        DeferredWorkQueue.runLater(HunterIllagerCore::addFeatures);
+
+    }
+
+    private static void addFeatures() {
         ForgeRegistries.BIOMES.getValues().stream().forEach((biome -> {
+            biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, FeatureRegister.HUNTER_HOUSE.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG)));
+
             if (!BiomeDictionary.hasType(biome, BiomeDictionary.Type.NETHER)
                     && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.END)
                     && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.VOID)
                     && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.OCEAN)
                     && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.RIVER)
                     && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.MUSHROOM)
+                    && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.SANDY)
                     && (biome.getRegistryName().getNamespace().equals("minecraft")
                     || biome.getRegistryName().getNamespace().equals("midnight")
                     || biome.getRegistryName().getNamespace().equals("biomesoplenty")
                     || biome.getRegistryName().getNamespace().equals("terraforged"))
+                    && (BiomeDictionary.hasType(biome, BiomeDictionary.Type.PLAINS)
+                    || BiomeDictionary.hasType(biome, BiomeDictionary.Type.FOREST))
             ) {
                 biome.addStructure(FeatureRegister.HUNTER_HOUSE.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG));
             }
-
-            biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, FeatureRegister.HUNTER_HOUSE.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG)));
         }));
     }
 
