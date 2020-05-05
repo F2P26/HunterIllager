@@ -348,7 +348,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
                 if (this.rand.nextFloat() < 0.005F && this.getHealth() < this.getMaxHealth()) {
                     if (this.getHeldItemOffhand().isEmpty()) {
                         ItemStack food = findFood();
-                        this.setItemStackToSlot(EquipmentSlotType.OFFHAND, food);
+                        this.setItemStackToSlot(EquipmentSlotType.OFFHAND, food.split(1));
                     }
                     this.foodUseTimer = this.getHeldItemOffhand().getUseDuration();
                     this.setEatFood(true);
