@@ -46,7 +46,7 @@ public class HunterHousePieces {
             p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, hunterbase_Template, p_207617_1_, p_207617_2_, 0));
         }
 
-        p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, crafthut, p_207617_1_, p_207617_2_, 0));
+        //p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, crafthut, p_207617_1_, p_207617_2_, 0));
     }
 
 
