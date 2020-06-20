@@ -1,5 +1,6 @@
 package baguchan.hunterillager.entity.projectile;
 
+import baguchan.hunterillager.event.BoomerangEventFactory;
 import baguchan.hunterillager.init.HunterEntityRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -21,6 +22,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.SoundCategory;
@@ -73,6 +75,28 @@ public class BoomerangEntity extends Entity implements IProjectile {
         this(HunterEntityRegistry.BOOMERANG, world, entity, boomerang);
     }
 
+    private void onHitFluid(BlockRayTraceResult result) {
+        double velocity = this.getVelocity();
+
+        double horizontal = this.getMotion().getY() * this.getMotion().getY();
+        if (!this.world.isRemote) {
+            if (result.getType() == RayTraceResult.Type.BLOCK && result.isInside()) {
+                if (velocity >= 0.65F && horizontal < 0.175F) {
+
+                    if (!this.world.getFluidState(result.getPos()).isEmpty() && this.world.getFluidState(result.getPos()).isTagged(FluidTags.WATER)) {
+
+                        this.setMotion(this.getMotion().getX(), MathHelper.clamp(this.getMotion().getY() + 0.1F, -0.1F, 0.3F), this.getMotion().getZ());
+
+
+                        this.isAirBorne = true;
+                    }
+                }
+            }
+
+        }
+
+    }
+
     private void onHit(RayTraceResult result) {
         if (!this.world.isRemote) {
             boolean returnToOwner = result.getType() == RayTraceResult.Type.BLOCK;
@@ -107,11 +131,11 @@ public class BoomerangEntity extends Entity implements IProjectile {
                         });
                     }
 
-                    double velocity = this.getVelocity();
+                    double speed = this.getSpeed();
 
                     //TODO
                     //this.world.playSound(null, this.getPosX(), this.getPosY(), this.getPosZ(), HunterSounds.ITEM_BOOMERANG_HIT, SoundCategory.BLOCKS, 0.5F, 1.0F);
-                    if (piercingLevel < 1 || entityHits >= piercingLevel || velocity < 0.4F) {
+                    if (piercingLevel < 1 || entityHits >= piercingLevel || speed < 0.4F) {
                         returnToOwner = true;
                         this.totalHits += 1;
                     }
@@ -132,7 +156,7 @@ public class BoomerangEntity extends Entity implements IProjectile {
                     this.world.playSound(null, shooter.getPosition(), SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1);
 
                     Vec3d returnVec = this.throwPos.subtract(this.getPosX(), this.getPosY(), this.getPosZ()).normalize();
-                    double velocity = this.getVelocity();
+                    double velocity = this.getSpeed();
 
                     this.setMotion(velocity * returnVec.x, velocity * returnVec.y, velocity * returnVec.z);
 
@@ -141,7 +165,7 @@ public class BoomerangEntity extends Entity implements IProjectile {
                     this.setReturning(true);
                 } else {
                     Vec3d returnVec = this.throwPos.subtract(this.getPosX(), this.getPosY(), this.getPosZ()).normalize();
-                    double velocity = this.getVelocity();
+                    double velocity = this.getSpeed();
 
                     this.setMotion(velocity * returnVec.x, velocity * returnVec.y, velocity * returnVec.z);
 
@@ -216,18 +240,19 @@ public class BoomerangEntity extends Entity implements IProjectile {
         super.tick();
 
         this.flyTick++;
+        Vec3d vec3d = this.getMotion();
 
-        Vec3d vec3d = new Vec3d(this.getPosX(), this.getPosY(), this.getPosZ());
+        Vec3d vec3d1 = this.getPositionVec();
 
-        Vec3d vec3d1 = new Vec3d(this.getPosX() + this.getMotion().getX(), this.getPosY() + this.getMotion().getY(), this.getPosZ() + this.getMotion().getZ());
+        Vec3d vec3d2 = new Vec3d(this.getPosX() + this.getMotion().getX(), this.getPosY() + this.getMotion().getY(), this.getPosZ() + this.getMotion().getZ());
 
-        RayTraceResult raytraceresult = this.world.rayTraceBlocks(new RayTraceContext(vec3d, vec3d1, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, this));
+        RayTraceResult raytraceresult = this.world.rayTraceBlocks(new RayTraceContext(vec3d1, vec3d2, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, this));
 
         if (raytraceresult.getType() != RayTraceResult.Type.MISS) {
             vec3d1 = raytraceresult.getHitVec();
         }
 
-        EntityRayTraceResult entityRaytraceResult = func_213866_a(vec3d, vec3d1);
+        EntityRayTraceResult entityRaytraceResult = rayTraceEntities(vec3d1, vec3d2);
 
 
         if (entityRaytraceResult != null) {
@@ -250,14 +275,17 @@ public class BoomerangEntity extends Entity implements IProjectile {
             this.isAirBorne = true;
         }
 
-        Vec3d vec3d3 = this.getMotion();
+        BlockRayTraceResult fluidRaytraceResult = this.world.rayTraceBlocks(new RayTraceContext(vec3d1, vec3d2, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.ANY, this));
 
-        double d2 = this.getPosX() + vec3d3.x;
-        double d3 = this.getPosY() + vec3d3.y;
-        double d4 = this.getPosZ() + vec3d3.z;
+        this.onHitFluid(fluidRaytraceResult);
+        BoomerangEventFactory.boomerangSpeedTick(this, vec3d);
+
+
+        double d2 = this.getPosX() + vec3d.x;
+        double d3 = this.getPosY() + vec3d.y;
+        double d4 = this.getPosZ() + vec3d.z;
 
         this.setPosition(d2, d3, d4);
-        ;
 
         float f = MathHelper.sqrt(this.getMotion().getX() * this.getMotion().getX() + this.getMotion().getZ() * this.getMotion().getZ());
         this.rotationYaw = (float) (MathHelper.atan2(this.getMotion().getX(), this.getMotion().getZ()) * (double) (180F / (float) Math.PI));
@@ -309,13 +337,13 @@ public class BoomerangEntity extends Entity implements IProjectile {
             this.remove();
         } else if (loyaltyLevel > 0 && entity != null && this.isReturning()) {
             this.noClip = true;
-            Vec3d vec3d2 = new Vec3d(entity.getPosX() - this.getPosX(), entity.getPosY() + (double) entity.getEyeHeight() - this.getPosY(), entity.getPosZ() - this.getPosZ());
+            Vec3d vec3d3 = new Vec3d(entity.getPosX() - this.getPosX(), entity.getPosY() + (double) entity.getEyeHeight() - this.getPosY(), entity.getPosZ() - this.getPosZ());
             if (this.world.isRemote) {
                 this.lastTickPosY = this.getPosY();
             }
 
             double d0 = 0.05D * (double) loyaltyLevel;
-            this.setMotion(this.getMotion().scale(0.95D).add(vec3d2.normalize().scale(d0)));
+            this.setMotion(this.getMotion().scale(0.95D).add(vec3d3.normalize().scale(d0)));
         } else if (!this.hasNoGravity()) {
             this.setMotion(this.getMotion().add(0.0F, -f2, 0.0F));
             this.setMotion(this.getMotion().scale(f1));
@@ -328,7 +356,7 @@ public class BoomerangEntity extends Entity implements IProjectile {
     }
 
     @Nullable
-    protected EntityRayTraceResult func_213866_a(Vec3d p_213866_1_, Vec3d p_213866_2_) {
+    protected EntityRayTraceResult rayTraceEntities(Vec3d p_213866_1_, Vec3d p_213866_2_) {
         return ProjectileHelper.rayTraceEntities(this.world, this, p_213866_1_, p_213866_2_, this.getBoundingBox().expand(this.getMotion()).grow(1.0D), (p_213871_1_) -> {
             return !p_213871_1_.isSpectator() && p_213871_1_.isAlive() && p_213871_1_.canBeCollidedWith() && (p_213871_1_ != this.getShooter());
         });
@@ -442,8 +470,12 @@ public class BoomerangEntity extends Entity implements IProjectile {
         return this.dataManager.get(BOOMERANG);
     }
 
-    public double getVelocity() {
+    public double getSpeed() {
         return Math.sqrt(this.getMotion().getX() * this.getMotion().getX() + this.getMotion().getY() * this.getMotion().getY() + this.getMotion().getZ() * this.getMotion().getZ());
+    }
+
+    public double getVelocity() {
+        return Math.sqrt(this.getMotion().getX() * this.getMotion().getX() + this.getMotion().getZ() * this.getMotion().getZ());
     }
 
     public int getPiercingLevel() {

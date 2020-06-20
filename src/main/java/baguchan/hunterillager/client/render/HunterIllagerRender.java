@@ -21,7 +21,7 @@ public class HunterIllagerRender<T extends HunterIllagerEntity> extends MobRende
     public HunterIllagerRender(EntityRendererManager p_i47477_1_) {
         super(p_i47477_1_, new HunterIllagerModel<>(), 0.5F);
         this.addLayer(new HeadLayer<>(this));
-        this.addLayer(new CrossArmHeldItemLayer(this));
+        this.addLayer(new CrossArmHeldItemLayer<>(this));
         this.addLayer(new HeldItemLayer<T, HunterIllagerModel<T>>(this) {
             @Override
             public void render(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, T entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
