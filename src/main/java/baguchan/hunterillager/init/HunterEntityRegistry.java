@@ -5,6 +5,7 @@ import baguchan.hunterillager.entity.HunterIllagerEntity;
 import baguchan.hunterillager.entity.projectile.BoomerangEntity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -14,6 +15,7 @@ public class HunterEntityRegistry {
 
     @SubscribeEvent
     public static void registerEntity(IForgeRegistry<EntityType<?>> event) {
+        GlobalEntityTypeAttributes.put(HUNTERILLAGER, HunterIllagerEntity.getAttributeMap().func_233813_a_());
 
         event.register(HUNTERILLAGER.setRegistryName("hunterillager"));
         event.register(BOOMERANG.setRegistryName("boomerang"));

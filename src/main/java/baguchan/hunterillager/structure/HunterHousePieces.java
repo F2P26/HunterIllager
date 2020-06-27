@@ -14,10 +14,12 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.structure.StructurePiece;
 import net.minecraft.world.gen.feature.structure.TemplateStructurePiece;
 import net.minecraft.world.gen.feature.template.BlockIgnoreStructureProcessor;
@@ -55,7 +57,7 @@ public class HunterHousePieces {
         private final Rotation field_207616_e;
 
         public Piece(TemplateManager p_i49313_1_, ResourceLocation p_i49313_2_, BlockPos p_i49313_3_, Rotation p_i49313_4_, int p_i49313_5_) {
-            super(FeatureRegister.HUNTER_HOUSE_STRUCTURE, 0);
+            super(FeatureRegister.HUNTER_HOUSE_STRUCTURE_PIECE, 0);
             this.field_207615_d = p_i49313_2_;
             BlockPos blockpos = HunterHousePieces.structurePos.get(p_i49313_2_);
             this.templatePosition = p_i49313_3_.add(blockpos.getX(), blockpos.getY() - p_i49313_5_, blockpos.getZ());
@@ -64,7 +66,7 @@ public class HunterHousePieces {
         }
 
         public Piece(TemplateManager p_i50566_1_, CompoundNBT p_i50566_2_) {
-            super(FeatureRegister.HUNTER_HOUSE_STRUCTURE, p_i50566_2_);
+            super(FeatureRegister.HUNTER_HOUSE_STRUCTURE_PIECE, p_i50566_2_);
             this.field_207615_d = new ResourceLocation(p_i50566_2_.getString("Template"));
             this.field_207616_e = Rotation.valueOf(p_i50566_2_.getString("Rot"));
             this.func_207614_a(p_i50566_1_);
@@ -97,21 +99,18 @@ public class HunterHousePieces {
             }
         }
 
-        /**
-         * second Part of Structure generating, this for example places Spiderwebs, Mob Spawners, it closes Mineshafts at
-         * the end, it adds Fences...
-         */
-        public boolean func_225577_a_(IWorld worldIn, ChunkGenerator<?> chunkGenerator, Random randomIn, MutableBoundingBox structureBoundingBoxIn, ChunkPos p_74875_4_) {
+        @Override
+        public boolean func_230383_a_(ISeedReader worldIn, StructureManager p_230383_2_, ChunkGenerator p_230383_3_, Random p_230383_4_, MutableBoundingBox p_230383_5_, ChunkPos p_230383_6_, BlockPos p_230383_7_) {
             BlockPos blockpos = this.template.getSize();
 
             BlockPos blockpos1 = this.templatePosition;
             int i = worldIn.getHeight(Heightmap.Type.WORLD_SURFACE_WG, blockpos1.getX(), blockpos1.getZ());
             BlockPos blockpos2 = this.templatePosition;
             this.templatePosition = this.templatePosition.add(0, i - 90 - 1, 0);
-            boolean flag = super.func_225577_a_(worldIn, chunkGenerator, randomIn, structureBoundingBoxIn, p_74875_4_);
-
+            boolean flag = super.func_230383_a_(worldIn, p_230383_2_, p_230383_3_, p_230383_4_, p_230383_5_, p_230383_6_, p_230383_7_);
 
             this.templatePosition = blockpos2;
+
             return flag;
         }
     }

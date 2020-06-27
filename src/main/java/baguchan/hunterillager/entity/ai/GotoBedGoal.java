@@ -50,7 +50,7 @@ public class GotoBedGoal extends MoveToBlockGoal {
         super.tick();
 
         if (!this.illager.isSleeping()) {
-            BlockPos pos = this.illager.getPosition();
+            BlockPos pos = this.illager.func_233580_cy_();
             BlockState blockstate = this.illager.world.getBlockState(pos);
 
             if (this.getIsAboveDestination()) {
@@ -71,14 +71,9 @@ public class GotoBedGoal extends MoveToBlockGoal {
      * Return true to set given position as destination
      */
     protected boolean shouldMoveTo(IWorldReader worldIn, BlockPos pos) {
-        if (!worldIn.isAirBlock(pos.up())) {
-            return false;
-        } else {
-            BlockState blockstate = worldIn.getBlockState(pos);
-            Block block = blockstate.getBlock();
+        BlockState blockstate = worldIn.getBlockState(pos);
+        Block block = blockstate.getBlock();
 
-            return block.isIn(BlockTags.BEDS) && blockstate.get(BedBlock.PART) == BedPart.HEAD && !blockstate.get(BedBlock.OCCUPIED);
-
-        }
+        return block.isIn(BlockTags.BEDS) && blockstate.get(BedBlock.PART) == BedPart.HEAD && !blockstate.get(BedBlock.OCCUPIED);
     }
 }

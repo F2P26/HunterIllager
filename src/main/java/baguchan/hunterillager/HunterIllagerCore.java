@@ -7,11 +7,7 @@ import baguchan.hunterillager.init.HunterItems;
 import baguchan.hunterillager.structure.FeatureRegister;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.IFeatureConfig;
-import net.minecraft.world.gen.placement.IPlacementConfig;
-import net.minecraft.world.gen.placement.Placement;
+import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -37,7 +33,7 @@ public class HunterIllagerCore {
 
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, this::onItemsRegistry);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(EntityType.class, this::onEntityRegistry);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Feature.class, this::onFeatureRegistry);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Structure.class, this::onStructureRegistry);
         MinecraftForge.EVENT_BUS.register(this);
     }
 
@@ -51,8 +47,6 @@ public class HunterIllagerCore {
 
     private static void addFeatures() {
         ForgeRegistries.BIOMES.getValues().stream().forEach((biome -> {
-            biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, FeatureRegister.HUNTER_HOUSE.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG)));
-
             if (!BiomeDictionary.hasType(biome, BiomeDictionary.Type.NETHER)
                     && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.END)
                     && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.VOID)
@@ -67,7 +61,7 @@ public class HunterIllagerCore {
                     && (BiomeDictionary.hasType(biome, BiomeDictionary.Type.PLAINS)
                     || BiomeDictionary.hasType(biome, BiomeDictionary.Type.FOREST))
             ) {
-                biome.addStructure(FeatureRegister.HUNTER_HOUSE.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG));
+                biome.func_235063_a_(FeatureRegister.HUNTER_HOUSE);
             }
         }));
     }
@@ -93,8 +87,8 @@ public class HunterIllagerCore {
     }
 
     @SubscribeEvent
-    public void onFeatureRegistry(final RegistryEvent.Register<Feature<?>> event) {
-        IForgeRegistry<Feature<?>> registry = event.getRegistry();
+    public void onStructureRegistry(final RegistryEvent.Register<Structure<?>> event) {
+        IForgeRegistry<Structure<?>> registry = event.getRegistry();
 
         FeatureRegister.registerStructure(registry);
     }
