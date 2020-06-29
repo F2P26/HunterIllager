@@ -63,7 +63,7 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 public class HunterIllagerEntity extends AbstractIllagerEntity implements IRangedAttackMob {
-    private static final Predicate<ItemEntity> field_213665_b = (p_213647_0_) -> {
+    private static final Predicate<ItemEntity> foodPredicate = (p_213647_0_) -> {
         return !p_213647_0_.cannotPickup() && p_213647_0_.isAlive() && (ItemStack.areItemStacksEqual(p_213647_0_.getItem(), new ItemStack(HunterItems.BOOMERANG)) || isFoods(p_213647_0_.getItem().getItem()));
     };
 
@@ -100,25 +100,25 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         super.registerGoals();
         this.goalSelector.addGoal(0, new SwimGoal(this));
         this.goalSelector.addGoal(1, new OpenDoorGoal(this, true));
-        this.goalSelector.addGoal(2, new HunterIllagerEntity.MoveToFoodOrBoomerangGoal<>(this));
-        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.85F, false) {
+        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 0.85F, false) {
             @Override
             public boolean shouldExecute() {
                 return !isHolding(Items.BOW) && !isHolding(HunterItems.BOOMERANG) && super.shouldExecute();
             }
         });
-        this.goalSelector.addGoal(4, new RangedAggroedAttackGoal(this, 0.7D, 40, 16.0F) {
+        this.goalSelector.addGoal(3, new RangedAggroedAttackGoal(this, 0.7D, 40, 16.0F) {
             @Override
             public boolean shouldExecute() {
                 return !isHolding(Items.BOW) && isHolding(HunterItems.BOOMERANG) && super.shouldExecute();
             }
         });
-        this.goalSelector.addGoal(4, new RangedBowAttackGoal(this, 0.7D, 25, 15.0F) {
+        this.goalSelector.addGoal(3, new RangedBowAttackGoal(this, 0.7D, 25, 15.0F) {
             @Override
             public boolean shouldExecute() {
                 return isHolding(Items.BOW) && !isHolding(HunterItems.BOOMERANG) && super.shouldExecute();
             }
         });
+        this.goalSelector.addGoal(4, new HunterIllagerEntity.MoveToFoodGoal<>(this));
         this.goalSelector.addGoal(6, new WakeUpGoal(this));
         this.goalSelector.addGoal(7, new GotoBedGoal(this, 0.7D));
         this.goalSelector.addGoal(8, new MoveToGoal(this, 10.0D, 0.7D));
@@ -263,8 +263,17 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         this.setCanPickUpLoot(true);
     }
 
-    public Inventory func_213674_eg() {
+    public Inventory getInventory() {
         return this.inventory;
+    }
+
+    public boolean needFood() {
+        for (int i = 0; i < this.getInventory().getSizeInventory(); ++i) {
+            if (this.getInventory().getStackInSlot(i).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -558,20 +567,17 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         }
     }
 
-    public class MoveToFoodOrBoomerangGoal<T extends HunterIllagerEntity> extends Goal {
+    public static class MoveToFoodGoal<T extends HunterIllagerEntity> extends Goal {
         private final T illager;
 
-        public MoveToFoodOrBoomerangGoal(T p_i50572_2_) {
+        public MoveToFoodGoal(T p_i50572_2_) {
             this.illager = p_i50572_2_;
             this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
         }
 
-        /**
-         * Returns whether the EntityAIBase should begin execution.
-         */
         public boolean shouldExecute() {
-            if ((this.illager.getHeldItem(Hand.MAIN_HAND).isEmpty() || this.illager.getHeldItem(Hand.OFF_HAND).isEmpty())) {
-                List<ItemEntity> list = this.illager.world.getEntitiesWithinAABB(ItemEntity.class, this.illager.getBoundingBox().grow(16.0D, 8.0D, 16.0D), HunterIllagerEntity.field_213665_b);
+            if (this.illager.getRNG().nextInt(10) == 0 && (this.illager.needFood())) {
+                List<ItemEntity> list = this.illager.world.getEntitiesWithinAABB(ItemEntity.class, this.illager.getBoundingBox().grow(16.0D, 8.0D, 16.0D), HunterIllagerEntity.foodPredicate);
                 if (!list.isEmpty()) {
                     return this.illager.getNavigator().tryMoveToEntityLiving(list.get(0), 0.85D);
                 }
@@ -585,7 +591,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
          */
         public void tick() {
             if (this.illager.getNavigator().getTargetPos().withinDistance(this.illager.getPositionVec(), 1.414D)) {
-                List<ItemEntity> list = this.illager.world.getEntitiesWithinAABB(ItemEntity.class, this.illager.getBoundingBox().grow(4.0D, 4.0D, 4.0D), HunterIllagerEntity.field_213665_b);
+                List<ItemEntity> list = this.illager.world.getEntitiesWithinAABB(ItemEntity.class, this.illager.getBoundingBox().grow(4.0D, 4.0D, 4.0D), HunterIllagerEntity.foodPredicate);
                 if (!list.isEmpty()) {
                     this.illager.updateEquipmentIfNeeded(list.get(0));
                 }
