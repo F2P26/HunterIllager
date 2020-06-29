@@ -29,7 +29,7 @@ public class HunterTypes {
 
 
     @SubscribeEvent
-    public static void onRegisterLores(RegistryEvent.Register<HunterType> event) {
+    public static void onRegisterHunterType(RegistryEvent.Register<HunterType> event) {
         event.getRegistry().registerAll(PLAIN.setRegistryName("plain"),
                 SNOW.setRegistryName("snow"));
     }
