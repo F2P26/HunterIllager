@@ -141,7 +141,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
     }
 
     public static AttributeModifierMap.MutableAttribute getAttributeMap() {
-        return MonsterEntity.func_233666_p_().func_233815_a_(Attributes.field_233821_d_, (double) 0.35F).func_233815_a_(Attributes.field_233818_a_, 24.0D).func_233815_a_(Attributes.field_233819_b_, 22.0D).func_233815_a_(Attributes.field_233823_f_, 2.0D);
+        return MonsterEntity.func_233666_p_().func_233815_a_(Attributes.MOVEMENT_SPEED, (double) 0.35F).func_233815_a_(Attributes.MAX_HEALTH, 24.0D).func_233815_a_(Attributes.FOLLOW_RANGE, 22.0D).func_233815_a_(Attributes.ATTACK_DAMAGE, 2.0D);
     }
 
     public ILivingEntityData onInitialSpawn(IWorld world, DifficultyInstance difficulty, SpawnReason spawnreason, @Nullable ILivingEntityData entitydata, @Nullable CompoundNBT compound) {
@@ -548,6 +548,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
 
     public static class MoveToFoodGoal<T extends HunterIllagerEntity> extends Goal {
         private final T illager;
+        private ItemEntity targetItem;
 
         public MoveToFoodGoal(T p_i50572_2_) {
             this.illager = p_i50572_2_;
@@ -561,7 +562,9 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
             if (this.illager.getRNG().nextInt(10) == 0 && (this.illager.needFood())) {
                 List<ItemEntity> list = this.illager.world.getEntitiesWithinAABB(ItemEntity.class, this.illager.getBoundingBox().grow(16.0D, 8.0D, 16.0D), HunterIllagerEntity.food);
                 if (!list.isEmpty()) {
-                    return this.illager.getNavigator().tryMoveToEntityLiving(list.get(0), 0.85D);
+                    this.targetItem = list.get(this.illager.getRNG().nextInt(list.size()));
+
+                    return this.illager.getNavigator().tryMoveToEntityLiving(this.targetItem, 0.85D);
                 }
             }
 
@@ -573,12 +576,10 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
          */
         public void tick() {
             if (this.illager.getNavigator().getTargetPos().withinDistance(this.illager.getPositionVec(), 1.414D)) {
-                List<ItemEntity> list = this.illager.world.getEntitiesWithinAABB(ItemEntity.class, this.illager.getBoundingBox().grow(4.0D, 4.0D, 4.0D), HunterIllagerEntity.food);
-                if (!list.isEmpty()) {
-                    this.illager.updateEquipmentIfNeeded(list.get(0));
+                if (this.targetItem != null && targetItem.isAlive()) {
+                    this.illager.updateEquipmentIfNeeded(targetItem);
                 }
             }
-
         }
     }
 }

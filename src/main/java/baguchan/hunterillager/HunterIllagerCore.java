@@ -2,16 +2,11 @@ package baguchan.hunterillager;
 
 import baguchan.hunterillager.client.HunterRenderingRegistry;
 import baguchan.hunterillager.event.EntityEventHandler;
-import baguchan.hunterillager.structure.FeatureRegister;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ForgeRegistries;
 
 @Mod("hunterillager")
 public class HunterIllagerCore {
@@ -36,7 +31,7 @@ public class HunterIllagerCore {
     }
 
     private static void addFeatures() {
-        for (Biome biome : ForgeRegistries.BIOMES.getValues()) {
+        /*for (Biome biome : ForgeRegistries.BIOMES.getValues()) {
 
             if (!BiomeDictionary.hasType(biome, BiomeDictionary.Type.NETHER)
                     && !BiomeDictionary.hasType(biome, BiomeDictionary.Type.END)
@@ -53,7 +48,7 @@ public class HunterIllagerCore {
             ) {
                 biome.func_235063_a_(FeatureRegister.HUNTER_HOUSE_STRUCTURE.func_236391_a_(NoFeatureConfig.field_236559_b_));
             }
-        }
+        }*/
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {

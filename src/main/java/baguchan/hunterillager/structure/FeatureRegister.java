@@ -28,6 +28,7 @@ public class FeatureRegister {
     public static void registerStructure(RegistryEvent.Register<Structure<?>> registry) {
         registry.getRegistry().register(HUNTER_HOUSE_STRUCTURE.setRegistryName(HunterIllagerCore.MODID, "hunterhouse"));
         Structure.field_236365_a_.put(prefix("hunterhouse"), HUNTER_HOUSE_STRUCTURE);
+        //DimensionStructuresSettings.field_236191_b_.put(HUNTER_HOUSE_STRUCTURE,new StructureSeparationSettings(28, 6, 13257618));
     }
 
     private static String prefix(String path) {
