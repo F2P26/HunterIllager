@@ -430,7 +430,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
 
     @Override
     protected void collideWithEntity(Entity entityIn) {
-        if (entityIn instanceof BoomerangEntity && ((BoomerangEntity) entityIn).getShooter() == this) {
+        if (entityIn instanceof BoomerangEntity && ((BoomerangEntity) entityIn).func_234616_v_() == this) {
             ((BoomerangEntity) entityIn).remove();
             this.setHeldItem(Hand.MAIN_HAND, ((BoomerangEntity) entityIn).getBoomerang());
         }
@@ -469,12 +469,12 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
 
             if (main.getItem() instanceof BoomerangItem) {
                 BoomerangEntity projectile = new BoomerangEntity(world, this, main.copy());
-                projectile.shoot(this, this.rotationPitch, this.rotationYaw, 0.0F, 1.0F, 1.0F);
+                projectile.func_234612_a_(this, this.rotationPitch, this.rotationYawHead, 0.0F, 1.0F, 1.0F);
                 world.addEntity(projectile);
                 main.shrink(1);
             } else if (off.getItem() instanceof BoomerangItem) {
                 BoomerangEntity projectile = new BoomerangEntity(world, this, off.copy());
-                projectile.shoot(this, this.rotationPitch, this.rotationYaw, 0.0F, 1.0F, 1.0F);
+                projectile.func_234612_a_(this, this.rotationPitch, this.rotationYawHead, 0.0F, 1.0F, 1.0F);
                 world.addEntity(projectile);
                 off.shrink(1);
             }

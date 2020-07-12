@@ -36,7 +36,7 @@ public class BoomerangItem extends Item {
             float velocity = 1.5F * BowItem.getArrowVelocity(heldTime);
 
             BoomerangEntity projectile = new BoomerangEntity(world, entity, stack.copy());
-            projectile.shoot(entity, entity.rotationPitch, entity.rotationYaw, 0.0F, velocity, 1.0F);
+            projectile.func_234612_a_(entity, entity.rotationPitch, entity.rotationYaw, 0.0F, velocity, 1.0F);
 
             //projectile.setCandrop(true);
             world.addEntity(projectile);
