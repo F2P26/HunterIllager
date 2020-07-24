@@ -2,19 +2,25 @@ package baguchan.hunterillager.structure;
 
 import baguchan.hunterillager.HunterIllagerCore;
 import com.mojang.serialization.Codec;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.gen.feature.structure.StructureManager;
+import net.minecraft.world.gen.feature.structure.StructurePiece;
 import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.feature.template.TemplateManager;
+
+import java.util.Random;
 
 public class HunterHouseStructure extends Structure<NoFeatureConfig> {
     public HunterHouseStructure(Codec<NoFeatureConfig> p_i51440_1_) {
@@ -62,6 +68,39 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
             Rotation rotation = Rotation.values()[this.rand.nextInt(Rotation.values().length)];
             HunterHousePieces.addStructure(templateManagerIn, blockpos, rotation, this.components, this.rand, biomeIn);
             this.recalculateStructureSize();
+        }
+
+        public void func_230366_a_(ISeedReader p_230366_1_, StructureManager p_230366_2_, ChunkGenerator p_230366_3_, Random p_230366_4_, MutableBoundingBox p_230366_5_, ChunkPos p_230366_6_) {
+            super.func_230366_a_(p_230366_1_, p_230366_2_, p_230366_3_, p_230366_4_, p_230366_5_, p_230366_6_);
+            int i = this.bounds.minY;
+
+            for (int j = p_230366_5_.minX; j <= p_230366_5_.maxX; ++j) {
+                for (int k = p_230366_5_.minZ; k <= p_230366_5_.maxZ; ++k) {
+                    BlockPos blockpos = new BlockPos(j, i, k);
+                    if (!p_230366_1_.isAirBlock(blockpos) && this.bounds.isVecInside(blockpos)) {
+                        boolean flag = false;
+
+                        for (StructurePiece structurepiece : this.components) {
+                            if (structurepiece.getBoundingBox().isVecInside(blockpos)) {
+                                flag = true;
+                                break;
+                            }
+                        }
+
+                        if (flag) {
+                            for (int l = i - 1; l > 1; --l) {
+                                BlockPos blockpos1 = new BlockPos(j, l, k);
+                                if (!p_230366_1_.isAirBlock(blockpos1) && !p_230366_1_.getBlockState(blockpos1).getMaterial().isLiquid()) {
+                                    break;
+                                }
+
+                                p_230366_1_.setBlockState(blockpos1, Blocks.DIRT.getDefaultState(), 2);
+                            }
+                        }
+                    }
+                }
+            }
+
         }
     }
 }
