@@ -39,7 +39,7 @@ public class HunterIllagerCore {
     }
 
     private static void addFeatures() {
-        StructureSeparationSettings settings = new StructureSeparationSettings(28, 10, 14234632);
+        StructureSeparationSettings settings = new StructureSeparationSettings(26, 10, 14234632);
 
         // Register separation settings for big dungeon in the settings presets
         ImmutableSet.of(DimensionSettings.Preset.field_236122_b_, DimensionSettings.Preset.field_236123_c_, DimensionSettings.Preset.field_236124_d_,
