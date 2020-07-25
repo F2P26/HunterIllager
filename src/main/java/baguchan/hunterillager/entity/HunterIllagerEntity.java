@@ -7,10 +7,7 @@ import baguchan.hunterillager.entity.ai.GotoBedGoal;
 import baguchan.hunterillager.entity.ai.RangedAggroedAttackGoal;
 import baguchan.hunterillager.entity.ai.WakeUpGoal;
 import baguchan.hunterillager.entity.projectile.BoomerangEntity;
-import baguchan.hunterillager.huntertype.HunterType;
-import baguchan.hunterillager.huntertype.HunterTypeUtils;
 import baguchan.hunterillager.init.HunterItems;
-import baguchan.hunterillager.init.HunterTypes;
 import baguchan.hunterillager.item.BoomerangItem;
 import com.google.common.collect.Maps;
 import net.minecraft.enchantment.Enchantment;
@@ -56,7 +53,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.raid.Raid;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.BiomeDictionary;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
@@ -150,10 +146,6 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         if (spawnreason != SpawnReason.MOB_SUMMONED) {
             this.inventory.addItem(new ItemStack(Items.PORKCHOP, 3));
         }
-
-        if (BiomeDictionary.hasType(world.getBiome(this.func_233580_cy_()), BiomeDictionary.Type.SNOWY)) {
-            this.setHunterType(HunterTypes.SNOW);
-        }
         return super.onInitialSpawn(world, difficulty, spawnreason, entitydata, compound);
     }
 
@@ -181,7 +173,6 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
     protected void registerData() {
         super.registerData();
         this.getDataManager().register(IS_EATING, false);
-        this.getDataManager().register(TYPE, HunterTypes.PLAIN.getRegistryName().toString());
     }
 
     @Override
@@ -216,8 +207,6 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
             compound.put("HomeTarget", NBTUtil.writeBlockPos(this.homePosition));
         }
 
-        HunterTypeUtils.setHunterType(compound, this.getHunterType());
-
         compound.putInt("CooldownTicks", this.cooldownTicks);
 
         ListNBT listnbt = new ListNBT();
@@ -241,12 +230,6 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
 
         if (compound.contains("HomeTarget")) {
             this.homePosition = NBTUtil.readBlockPos(compound.getCompound("HomeTarget"));
-        }
-
-        if (compound.contains("HunterType")) {
-            this.setHunterType(HunterTypeUtils.getHunterTypeFromNBT(compound));
-        } else {
-            this.setHunterType(HunterTypes.PLAIN);
         }
 
         this.cooldownTicks = compound.getInt("CooldownTicks");
@@ -306,14 +289,6 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
     @Nullable
     public BlockPos getMainHome() {
         return this.homePosition;
-    }
-
-    public void setHunterType(HunterType hunterType) {
-        this.getDataManager().set(TYPE, hunterType.getRegistryName().toString());
-    }
-
-    public HunterType getHunterType() {
-        return HunterTypeUtils.getHunterFromString(this.getDataManager().get(TYPE));
     }
 
     public boolean isCooldown() {

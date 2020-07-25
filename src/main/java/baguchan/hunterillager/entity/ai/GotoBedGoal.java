@@ -4,6 +4,7 @@ import baguchan.hunterillager.entity.HunterIllagerEntity;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.ai.goal.MoveToBlockGoal;
 import net.minecraft.state.properties.BedPart;
 import net.minecraft.tags.BlockTags;
@@ -57,6 +58,11 @@ public class GotoBedGoal extends MoveToBlockGoal {
                 this.illager.startSleeping(this.destinationBlock);
             }
         }
+    }
+
+    @Override
+    protected int getRunDelay(CreatureEntity creatureIn) {
+        return 60 + creatureIn.getRNG().nextInt(100);
     }
 
     public double getTargetDistanceSq() {
