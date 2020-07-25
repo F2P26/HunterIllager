@@ -137,7 +137,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
     }
 
     public static AttributeModifierMap.MutableAttribute getAttributeMap() {
-        return MonsterEntity.func_233666_p_().func_233815_a_(Attributes.MOVEMENT_SPEED, (double) 0.35F).func_233815_a_(Attributes.MAX_HEALTH, 24.0D).func_233815_a_(Attributes.FOLLOW_RANGE, 22.0D).func_233815_a_(Attributes.ATTACK_DAMAGE, 2.0D);
+        return MonsterEntity.func_233666_p_().func_233815_a_(Attributes.MOVEMENT_SPEED, (double) 0.35F).func_233815_a_(Attributes.MAX_HEALTH, 26.0D).func_233815_a_(Attributes.FOLLOW_RANGE, 22.0D).func_233815_a_(Attributes.ATTACK_DAMAGE, 2.0D);
     }
 
     public ILivingEntityData onInitialSpawn(IWorld world, DifficultyInstance difficulty, SpawnReason spawnreason, @Nullable ILivingEntityData entitydata, @Nullable CompoundNBT compound) {
@@ -190,10 +190,10 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
             Map<Enchantment, Integer> map = Maps.newHashMap();
             map.put(Enchantments.POWER, i);
             EnchantmentHelper.setEnchantments(map, itemstack);
-            if (flag3) {
-                this.inventory.addItem(new ItemStack(Items.GOLDEN_APPLE, 1));
-            }
+        }
 
+        if (flag3) {
+            this.inventory.addItem(new ItemStack(Items.GOLDEN_APPLE, 1));
         }
 
         this.setItemStackToSlot(EquipmentSlotType.MAINHAND, itemstack);

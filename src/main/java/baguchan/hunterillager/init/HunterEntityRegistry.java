@@ -6,6 +6,7 @@ import baguchan.hunterillager.entity.projectile.BoomerangEntity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
+import net.minecraft.world.raid.Raid;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -22,6 +23,7 @@ public class HunterEntityRegistry {
         event.getRegistry().register(HUNTERILLAGER.setRegistryName("hunterillager"));
         event.getRegistry().register(BOOMERANG.setRegistryName("boomerang"));
 
+        Raid.WaveMember.create("hunterillager", HUNTERILLAGER, new int[]{0, 0, 1, 0, 1, 0, 1, 2});
     }
 
     private static String prefix(String path) {
