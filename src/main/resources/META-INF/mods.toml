@@ -16,6 +16,8 @@ modId="hunterillager" #mandatory
 version="1.0.0" #mandatory
  # A display name for the mod
 displayName="HunterIllager" #mandatory
+
+displayURL="https://www.curseforge.com/minecraft/mc-mods/hunterillager"
 # A text field displayed in the mod UI
 authors="bagu_chan" #optional
 # The description text for the mod (multi line!) (#mandatory)
