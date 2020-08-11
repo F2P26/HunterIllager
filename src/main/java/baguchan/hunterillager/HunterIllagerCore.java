@@ -43,9 +43,9 @@ public class HunterIllagerCore {
             StructureSeparationSettings settings = new StructureSeparationSettings(26, 10, 14234632);
 
             // Register separation settings for big dungeon in the settings presets
-            ImmutableSet.of(DimensionSettings.Preset.field_236122_b_, DimensionSettings.Preset.field_236123_c_, DimensionSettings.Preset.field_236124_d_,
-                    DimensionSettings.Preset.field_236125_e_, DimensionSettings.Preset.field_236126_f_, DimensionSettings.Preset.field_236127_g_)
-                    .forEach(p -> p.func_236137_b_().func_236108_a_().func_236195_a_().put(FeatureRegister.HUNTER_HOUSE_STRUCTURE, settings));
+            ImmutableSet.of(DimensionSettings.Preset.OVERWORLD, DimensionSettings.Preset.CAVES, DimensionSettings.Preset.AMPLIFIED,
+                    DimensionSettings.Preset.FLOATING_ISLANDS, DimensionSettings.Preset.END, DimensionSettings.Preset.NETHER)
+                    .forEach(p -> p.getSettings().getStructures().func_236195_a_().put(FeatureRegister.HUNTER_HOUSE_STRUCTURE, settings));
 
             for (Biome biome : ForgeRegistries.BIOMES.getValues()) {
 

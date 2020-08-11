@@ -51,7 +51,7 @@ public class GotoBedGoal extends MoveToBlockGoal {
         super.tick();
 
         if (!this.illager.isSleeping()) {
-            BlockPos pos = this.illager.func_233580_cy_();
+            BlockPos pos = this.illager.getPosition();
             BlockState blockstate = this.illager.world.getBlockState(pos);
 
             if (this.getIsAboveDestination()) {

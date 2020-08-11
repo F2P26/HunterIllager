@@ -124,7 +124,7 @@ public class BoomerangEntity extends ThrowableEntity {
         if (returnToOwner && !isReturning()) {
             if (this.func_234616_v_() != null && this.shouldReturnToThrower() && EnchantmentHelper.getEnchantmentLevel(Enchantments.LOYALTY, this.getBoomerang()) > 0) {
                 Entity shooter = this.func_234616_v_();
-                this.world.playSound(null, shooter.func_233580_cy_(), SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1);
+                this.world.playSound(null, shooter.getPosition(), SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1);
                 Vector3d motion = this.getMotion();
 
                 double motionX = motion.getX();
@@ -140,7 +140,7 @@ public class BoomerangEntity extends ThrowableEntity {
 
                 if (loyaltyLevel > 0 && !this.isReturning()) {
                     if (entity != null) {
-                        this.world.playSound(null, entity.func_233580_cy_(), SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1);
+                        this.world.playSound(null, entity.getPosition(), SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1);
                         this.setReturning(true);
                     }
                 }
@@ -160,7 +160,7 @@ public class BoomerangEntity extends ThrowableEntity {
 
                 if (loyaltyLevel > 0 && !this.isReturning()) {
                     if (entity != null) {
-                        this.world.playSound(null, entity.func_233580_cy_(), SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1);
+                        this.world.playSound(null, entity.getPosition(), SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1);
                         this.setReturning(true);
                     }
                 }
@@ -212,7 +212,7 @@ public class BoomerangEntity extends ThrowableEntity {
 
             if (loyaltyLevel > 0 && !this.isReturning() && this.totalHits >= this.getBounceLevel()) {
                 if (entity != null) {
-                    this.world.playSound(null, entity.func_233580_cy_(), SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1);
+                    this.world.playSound(null, entity.getPosition(), SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1);
                     this.setReturning(true);
                 }
             }
@@ -252,7 +252,7 @@ public class BoomerangEntity extends ThrowableEntity {
     @Override
     public void onCollideWithPlayer(PlayerEntity entityIn) {
         super.onCollideWithPlayer(entityIn);
-        if (!this.world.isRemote && this.isReturning() && entityIn == this.func_234616_v_()) {
+        if (!this.world.isRemote && this.flyTick >= 4 && entityIn == this.func_234616_v_()) {
             this.drop(this.func_234616_v_().getPosX(), this.func_234616_v_().getPosY(), this.func_234616_v_().getPosZ());
         }
     }
@@ -260,7 +260,7 @@ public class BoomerangEntity extends ThrowableEntity {
     @Override
     public void applyEntityCollision(Entity entityIn) {
         super.applyEntityCollision(entityIn);
-        if (!this.world.isRemote && this.isReturning() && entityIn == this.func_234616_v_()) {
+        if (!this.world.isRemote && this.flyTick >= 4 && entityIn == this.func_234616_v_()) {
             this.drop(this.func_234616_v_().getPosX(), this.func_234616_v_().getPosY(), this.func_234616_v_().getPosZ());
         }
     }
@@ -314,9 +314,9 @@ public class BoomerangEntity extends ThrowableEntity {
 
         Entity entity = this.func_234616_v_();
 
-        if (loyaltyLevel > 0 && !this.isReturning() && this.flyTick == 100) {
+        if (loyaltyLevel > 0 && !this.isReturning() && this.flyTick >= 100) {
             if (entity != null) {
-                this.world.playSound(null, entity.func_233580_cy_(), SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1);
+                this.world.playSound(null, entity.getPosition(), SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1, 1);
                 this.setReturning(true);
             }
         }

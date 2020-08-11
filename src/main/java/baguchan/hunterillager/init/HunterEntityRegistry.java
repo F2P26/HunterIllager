@@ -18,7 +18,7 @@ public class HunterEntityRegistry {
 
     @SubscribeEvent
     public static void registerEntity(RegistryEvent.Register<EntityType<?>> event) {
-        GlobalEntityTypeAttributes.put(HUNTERILLAGER, HunterIllagerEntity.getAttributeMap().func_233813_a_());
+        GlobalEntityTypeAttributes.put(HUNTERILLAGER, HunterIllagerEntity.getAttributeMap().create());
 
         event.getRegistry().register(HUNTERILLAGER.setRegistryName("hunterillager"));
         event.getRegistry().register(BOOMERANG.setRegistryName("boomerang"));

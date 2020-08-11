@@ -137,7 +137,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
     }
 
     public static AttributeModifierMap.MutableAttribute getAttributeMap() {
-        return MonsterEntity.func_233666_p_().func_233815_a_(Attributes.MOVEMENT_SPEED, (double) 0.35F).func_233815_a_(Attributes.MAX_HEALTH, 26.0D).func_233815_a_(Attributes.FOLLOW_RANGE, 22.0D).func_233815_a_(Attributes.ATTACK_DAMAGE, 2.0D);
+        return MonsterEntity.func_233666_p_().createMutableAttribute(Attributes.MOVEMENT_SPEED, (double) 0.35F).createMutableAttribute(Attributes.MAX_HEALTH, 26.0D).createMutableAttribute(Attributes.FOLLOW_RANGE, 22.0D).createMutableAttribute(Attributes.ATTACK_DAMAGE, 2.0D);
     }
 
     public ILivingEntityData onInitialSpawn(IWorld world, DifficultyInstance difficulty, SpawnReason spawnreason, @Nullable ILivingEntityData entitydata, @Nullable CompoundNBT compound) {
@@ -176,7 +176,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
     }
 
     @Override
-    public void func_213660_a(int p_213660_1_, boolean p_213660_2_) {
+    public void applyWaveBonus(int p_213660_1_, boolean p_213660_2_) {
         ItemStack itemstack = new ItemStack(Items.BOW);
         Raid raid = this.getRaid();
         int i = 1;
