@@ -1,5 +1,6 @@
 package baguchan.hunterillager.structure;
 
+import baguchan.hunterillager.HunterConfig;
 import baguchan.hunterillager.HunterIllagerCore;
 import baguchan.hunterillager.entity.HunterIllagerEntity;
 import baguchan.hunterillager.init.HunterEntityRegistry;
@@ -42,7 +43,7 @@ public class HunterHousePieces {
 
     public static void addStructure(TemplateManager p_207617_0_, BlockPos p_207617_1_, Rotation p_207617_2_, List<StructurePiece> p_207617_3_, Random p_207617_4_, Biome biome) {
 
-        if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.SNOWY)) {
+        if (HunterConfig.generateVariantHunterHouse && BiomeDictionary.hasType(biome, BiomeDictionary.Type.SNOWY)) {
             p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, snowny_hunterbase_Template, p_207617_1_, p_207617_2_, 0));
         } else {
             p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, hunterbase_Template, p_207617_1_, p_207617_2_, 0));
