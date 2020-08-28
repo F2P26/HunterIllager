@@ -48,9 +48,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.raid.Raid;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -140,7 +141,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         return MonsterEntity.func_233666_p_().createMutableAttribute(Attributes.MOVEMENT_SPEED, (double) 0.35F).createMutableAttribute(Attributes.MAX_HEALTH, 26.0D).createMutableAttribute(Attributes.FOLLOW_RANGE, 22.0D).createMutableAttribute(Attributes.ATTACK_DAMAGE, 2.0D);
     }
 
-    public ILivingEntityData onInitialSpawn(IWorld world, DifficultyInstance difficulty, SpawnReason spawnreason, @Nullable ILivingEntityData entitydata, @Nullable CompoundNBT compound) {
+    public ILivingEntityData onInitialSpawn(IServerWorld world, DifficultyInstance difficulty, SpawnReason spawnreason, @Nullable ILivingEntityData entitydata, @Nullable CompoundNBT compound) {
         this.setEquipmentBasedOnDifficulty(difficulty);
         this.setEnchantmentBasedOnDifficulty(difficulty);
         if (spawnreason != SpawnReason.MOB_SUMMONED) {
@@ -378,9 +379,8 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
     }
 
     @Override
-    public void onKillEntity(LivingEntity entity) {
-
-        super.onKillEntity(entity);
+    public void func_241847_a(ServerWorld serverworld, LivingEntity entity) {
+        super.func_241847_a(serverworld, entity);
         if (!(entity instanceof AbstractIllagerEntity)) {
 
             this.playSound(HunterSounds.HUNTER_ILLAGER_LAUGH, this.getSoundVolume() + 0.15F, this.getSoundPitch());

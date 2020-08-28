@@ -8,6 +8,7 @@ import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.provider.BiomeProvider;
@@ -62,12 +63,17 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
             super(p_i225806_1_, p_i225806_2_, p_i225806_3_, p_i225806_4_, p_i225806_5_, p_i225806_6_);
         }
 
-        public void func_230364_a_(ChunkGenerator generator, TemplateManager templateManagerIn, int chunkX, int chunkZ, Biome biomeIn, NoFeatureConfig p_230364_6_) {
+        @Override
+        public void func_230364_a_(DynamicRegistries p_230364_1_, ChunkGenerator p_230364_2_, TemplateManager templateManagerIn, int chunkX, int chunkZ, Biome biome, NoFeatureConfig p_230364_7_) {
             BlockPos blockpos = new BlockPos(chunkX * 16, 90, chunkZ * 16);
 
             Rotation rotation = Rotation.values()[this.rand.nextInt(Rotation.values().length)];
-            HunterHousePieces.addStructure(templateManagerIn, blockpos, rotation, this.components, this.rand, biomeIn);
+            HunterHousePieces.addStructure(templateManagerIn, blockpos, rotation, this.components, this.rand, biome);
             this.recalculateStructureSize();
+        }
+
+        public void func_230364_a_(ChunkGenerator generator, TemplateManager templateManagerIn, int chunkX, int chunkZ, Biome biomeIn, NoFeatureConfig p_230364_6_) {
+
         }
 
         public void func_230366_a_(ISeedReader p_230366_1_, StructureManager p_230366_2_, ChunkGenerator p_230366_3_, Random p_230366_4_, MutableBoundingBox p_230366_5_, ChunkPos p_230366_6_) {

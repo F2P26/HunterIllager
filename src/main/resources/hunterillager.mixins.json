@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "baguchan.hunterillager.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.8",
+  "refmap": "hunterillager.refmap.json",
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

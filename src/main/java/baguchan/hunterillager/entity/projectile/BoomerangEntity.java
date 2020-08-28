@@ -12,7 +12,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.entity.projectile.ThrowableEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -175,7 +174,9 @@ public class BoomerangEntity extends ThrowableEntity {
         BlockPos pos = result.getPos();
         BlockState state = this.world.getBlockState(pos);
         SoundType soundType = state.getSoundType(this.world, pos, this);
-        this.world.playSound(null, this.getPosX(), this.getPosY(), this.getPosZ(), soundType.getHitSound(), SoundCategory.BLOCKS, soundType.getVolume() * 0.26f, soundType.getPitch());
+        if (this.isReturning()) {
+            this.world.playSound(null, this.getPosX(), this.getPosY(), this.getPosZ(), soundType.getHitSound(), SoundCategory.BLOCKS, soundType.getVolume() * 0.26f, soundType.getPitch());
+        }
         //this.world.playSound(null, this.getPosX(), this.getPosY(), this.getPosZ(), HunterSounds.ITEM_BOOMERANG_HIT, SoundCategory.BLOCKS, 0.5F, 1.0F);
         this.totalHits++;
 
@@ -222,17 +223,11 @@ public class BoomerangEntity extends ThrowableEntity {
     }
 
     protected void onImpact(RayTraceResult result) {
-        RayTraceResult result2 = ProjectileHelper.func_234618_a_(this, this::func_230298_a_, RayTraceContext.BlockMode.COLLIDER);
-
-        RayTraceResult.Type raytraceresult$type = result2.getType();
-        if (raytraceresult$type == RayTraceResult.Type.ENTITY) {
-            this.onEntityHit((EntityRayTraceResult) result2);
-        } else if (raytraceresult$type == RayTraceResult.Type.BLOCK) {
-            this.func_230299_a_((BlockRayTraceResult) result2);
-        }
+        super.onImpact(result);
 
         int loyaltyLevel = this.dataManager.get(LOYALTY_LEVEL);
 
+        //If loyalty is 0, it will bounce several times and then drop.
         if (loyaltyLevel < 1 && this.totalHits >= this.getBounceLevel()) {
             if (!this.world.isRemote()) {
                 this.drop(this.getPosX(), this.getPosY(), this.getPosZ());
@@ -340,6 +335,11 @@ public class BoomerangEntity extends ThrowableEntity {
         this.collideWithNearbyEntities();
     }
 
+
+    /*
+     * This method is that boomerang uses to determine if it affects the entity
+     * If set to true, will allow damage
+     */
     protected boolean func_230298_a_(Entity p_230298_1_) {
         if (!p_230298_1_.isSpectator() && p_230298_1_.isAlive() && p_230298_1_.canBeCollidedWith()) {
             Entity entity = this.func_234616_v_();
@@ -349,20 +349,6 @@ public class BoomerangEntity extends ThrowableEntity {
         }
     }
 
-    private boolean func_234615_h_() {
-        Entity entity = this.func_234616_v_();
-        if (entity != null) {
-            for (Entity entity1 : this.world.getEntitiesInAABBexcluding(this, this.getBoundingBox().expand(this.getMotion()).grow(1.0D), (p_234613_0_) -> {
-                return !p_234613_0_.isSpectator() && p_234613_0_.canBeCollidedWith();
-            })) {
-                if (entity1.getLowestRidingEntity() == entity.getLowestRidingEntity()) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
 
     @OnlyIn(Dist.CLIENT)
     @Override

@@ -16,7 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.ISeedReader;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.Heightmap;
@@ -27,7 +27,6 @@ import net.minecraft.world.gen.feature.template.BlockIgnoreStructureProcessor;
 import net.minecraft.world.gen.feature.template.PlacementSettings;
 import net.minecraft.world.gen.feature.template.Template;
 import net.minecraft.world.gen.feature.template.TemplateManager;
-import net.minecraftforge.common.BiomeDictionary;
 
 import java.util.List;
 import java.util.Map;
@@ -43,7 +42,7 @@ public class HunterHousePieces {
 
     public static void addStructure(TemplateManager p_207617_0_, BlockPos p_207617_1_, Rotation p_207617_2_, List<StructurePiece> p_207617_3_, Random p_207617_4_, Biome biome) {
 
-        if (HunterConfig.generateVariantHunterHouse && BiomeDictionary.hasType(biome, BiomeDictionary.Type.SNOWY)) {
+        if (HunterConfig.generateVariantHunterHouse && biome.getPrecipitation() == Biome.RainType.SNOW) {
             p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, snowny_hunterbase_Template, p_207617_1_, p_207617_2_, 0));
         } else {
             p_207617_3_.add(new HunterHousePieces.Piece(p_207617_0_, hunterbase_Template, p_207617_1_, p_207617_2_, 0));
@@ -88,18 +87,6 @@ public class HunterHousePieces {
             tagCompound.putString("Rot", this.field_207616_e.name());
         }
 
-        protected void handleDataMarker(String function, BlockPos pos, IWorld worldIn, Random rand, MutableBoundingBox sbb) {
-            if ("hunter".equals(function)) {
-                worldIn.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
-                HunterIllagerEntity hunterIllager = HunterEntityRegistry.HUNTERILLAGER.create(worldIn.getWorld());
-                hunterIllager.enablePersistence();
-                hunterIllager.setPosition((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D);
-                hunterIllager.setMainHome(pos);
-                hunterIllager.onInitialSpawn(worldIn, worldIn.getDifficultyForLocation(pos), SpawnReason.STRUCTURE, (ILivingEntityData) null, (CompoundNBT) null);
-                worldIn.addEntity(hunterIllager);
-            }
-        }
-
         @Override
         public boolean func_230383_a_(ISeedReader worldIn, StructureManager p_230383_2_, ChunkGenerator p_230383_3_, Random p_230383_4_, MutableBoundingBox p_230383_5_, ChunkPos p_230383_6_, BlockPos p_230383_7_) {
             BlockPos blockpos = this.template.getSize();
@@ -113,6 +100,19 @@ public class HunterHousePieces {
             this.templatePosition = blockpos2;
 
             return flag;
+        }
+
+        @Override
+        protected void handleDataMarker(String function, BlockPos pos, IServerWorld worldIn, Random rand, MutableBoundingBox sbb) {
+            if ("hunter".equals(function)) {
+                worldIn.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
+                HunterIllagerEntity hunterIllager = HunterEntityRegistry.HUNTERILLAGER.create(worldIn.getWorld());
+                hunterIllager.enablePersistence();
+                hunterIllager.setPosition((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D);
+                hunterIllager.setMainHome(pos);
+                hunterIllager.onInitialSpawn(worldIn, worldIn.getDifficultyForLocation(pos), SpawnReason.STRUCTURE, (ILivingEntityData) null, (CompoundNBT) null);
+                worldIn.addEntity(hunterIllager);
+            }
         }
     }
 }

@@ -1,24 +1,30 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://dist.creeper.host/Sponge/maven' }
         jcenter()
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle'
-
 apply plugin: 'maven-publish'
+apply plugin: 'org.spongepowered.mixin'
+
+mixin {
+    add sourceSets.main, "hunterillager.refmap.json"
+}
 
 tasks.withType(Jar) {
     compileJava.options.encoding = 'UTF-8'
     compileJava.options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }
 
-version = '1.16.1-1.0.3'
+version = '1.16.2-1.0.0'
 group = 'baguchan.hunterillager' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'hunterillager'
 
@@ -47,6 +53,7 @@ minecraft {
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
+            arg "-mixin.config=hunterillager.mixins.json"
 
             mods {
                 examplemod {
@@ -63,6 +70,7 @@ minecraft {
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
+            arg "-mixin.config=hunterillager.mixins.json"
 
             mods {
                 examplemod {
@@ -78,7 +86,7 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
 
-    minecraft 'net.minecraftforge:forge:1.16.1-32.0.97'
+    minecraft 'net.minecraftforge:forge:1.16.2-33.0.22'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -91,7 +99,8 @@ jar {
                 "Implementation-Title": project.name,
                 "Implementation-Version": "${version}",
                 "Implementation-Vendor" :"baguchan",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                "MixinConfigs": "hunterillager.mixins.json"
         ])
     }
 }
