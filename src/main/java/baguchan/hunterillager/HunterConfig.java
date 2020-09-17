@@ -13,6 +13,7 @@ public class HunterConfig {
 
     public static boolean generateHunterHouse;
     public static boolean generateVariantHunterHouse;
+    public static boolean spawnHunterIllagerOnPartrol;
 
     static {
         Pair<Common, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(Common::new);
@@ -23,6 +24,7 @@ public class HunterConfig {
     public static void bakeConfig() {
         generateHunterHouse = COMMON.generateHunterHouse.get();
         generateVariantHunterHouse = COMMON.generateVariantHunterHouse.get();
+        spawnHunterIllagerOnPartrol = COMMON.spawnHunterIllagerOnPartrol.get();
     }
 
     @SubscribeEvent
@@ -35,6 +37,7 @@ public class HunterConfig {
     public static class Common {
         public final ForgeConfigSpec.BooleanValue generateHunterHouse;
         public final ForgeConfigSpec.BooleanValue generateVariantHunterHouse;
+        public final ForgeConfigSpec.BooleanValue spawnHunterIllagerOnPartrol;
 
         public Common(ForgeConfigSpec.Builder builder) {
             generateHunterHouse = builder
@@ -44,6 +47,9 @@ public class HunterConfig {
             generateVariantHunterHouse = builder
                     .translation(HunterIllagerCore.MODID + ".config.generateVariantHunterHouse")
                     .define("generate Variant HunterHouse", true);
+            spawnHunterIllagerOnPartrol = builder
+                    .translation(HunterIllagerCore.MODID + ".config.spawnHunterIllagerOnPatrol")
+                    .define("Spawn HunterIllager On Patrol", true);
         }
     }
 

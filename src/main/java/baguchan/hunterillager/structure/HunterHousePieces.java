@@ -57,7 +57,7 @@ public class HunterHousePieces {
         private final Rotation field_207616_e;
 
         public Piece(TemplateManager p_i49313_1_, ResourceLocation p_i49313_2_, BlockPos p_i49313_3_, Rotation p_i49313_4_, int p_i49313_5_) {
-            super(FeatureRegister.HUNTER_HOUSE_STRUCTURE_PIECE, 0);
+            super(StructureRegister.HUNTER_HOUSE_STRUCTURE_PIECE, 0);
             this.field_207615_d = p_i49313_2_;
             BlockPos blockpos = HunterHousePieces.structurePos.get(p_i49313_2_);
             this.templatePosition = p_i49313_3_.add(blockpos.getX(), blockpos.getY() - p_i49313_5_, blockpos.getZ());
@@ -66,7 +66,7 @@ public class HunterHousePieces {
         }
 
         public Piece(TemplateManager p_i50566_1_, CompoundNBT p_i50566_2_) {
-            super(FeatureRegister.HUNTER_HOUSE_STRUCTURE_PIECE, p_i50566_2_);
+            super(StructureRegister.HUNTER_HOUSE_STRUCTURE_PIECE, p_i50566_2_);
             this.field_207615_d = new ResourceLocation(p_i50566_2_.getString("Template"));
             this.field_207616_e = Rotation.valueOf(p_i50566_2_.getString("Rot"));
             this.func_207614_a(p_i50566_1_);

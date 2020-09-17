@@ -5,6 +5,7 @@
   "minVersion": "0.8",
   "refmap": "hunterillager.refmap.json",
   "mixins": [
+    "MixinPatrolSpawner"
   ],
   "injectors": {
     "defaultRequire": 1
