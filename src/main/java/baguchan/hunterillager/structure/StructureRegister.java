@@ -1,18 +1,17 @@
 package baguchan.hunterillager.structure;
 
-import baguchan.hunterillager.HunterConfig;
 import baguchan.hunterillager.HunterIllagerCore;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.WorldGenRegistries;
+import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
 import net.minecraft.world.gen.feature.structure.IStructurePieceType;
 import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.gen.settings.StructureSeparationSettings;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.event.world.BiomeLoadingEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -30,7 +29,7 @@ public class StructureRegister {
 
     @SubscribeEvent
     public static void registerStructure(RegistryEvent.Register<Structure<?>> registry) {
-        //DimensionStructuresSettings.field_236191_b_.put(HUNTER_HOUSE_STRUCTURE,new StructureSeparationSettings(28, 6, 15437620));
+        DimensionSettings.func_242746_i().getStructures().func_236195_a_().put(HUNTER_HOUSE_STRUCTURE, new StructureSeparationSettings(28, 6, 15437620));
 
         registry.getRegistry().register(HUNTER_HOUSE_STRUCTURE.setRegistryName(HunterIllagerCore.MODID, "hunterhouse"));
         Structure.field_236365_a_.put(prefix("hunterhouse"), HUNTER_HOUSE_STRUCTURE);
@@ -38,13 +37,6 @@ public class StructureRegister {
 
     private static <FC extends IFeatureConfig, F extends Structure<FC>> StructureFeature<FC, F> func_244162_a(String p_244162_0_, StructureFeature<FC, F> p_244162_1_) {
         return WorldGenRegistries.register(WorldGenRegistries.CONFIGURED_STRUCTURE_FEATURE, p_244162_0_, p_244162_1_);
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void addSpawn(BiomeLoadingEvent event) {
-        if (HunterConfig.generateHunterHouse) {
-            event.getGeneration().withStructure(StructureRegister.HUNTER_HOUSE);
-        }
     }
 
     private static String prefix(String path) {
