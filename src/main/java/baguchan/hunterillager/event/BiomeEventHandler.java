@@ -15,7 +15,7 @@ public class BiomeEventHandler {
     public static void addSpawn(BiomeLoadingEvent event) {
         if (HunterConfig.generateHunterHouse) {
             if (event.getName().getNamespace().toString().contains("minecraft") || event.getName().getNamespace().toString().contains("biomesoplenty")) {
-                if (event.getCategory() != Biome.Category.NETHER && event.getCategory() != Biome.Category.THEEND) {
+                if (event.getCategory() == Biome.Category.FOREST || event.getCategory() == Biome.Category.PLAINS) {
                     event.getGeneration().withStructure(StructureRegister.HUNTER_HOUSE);
                 }
 
