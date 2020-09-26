@@ -82,7 +82,6 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         return entitytype != EntityType.CAT && entitytype != EntityType.FOX && entitytype != EntityType.BEE && entitytype != EntityType.PANDA && !(p_213440_0_ instanceof TameableEntity) && !(p_213440_0_ instanceof AbstractHorseEntity) || entitytype == EntityType.SNOW_GOLEM;
     };
 
-    protected int eattick = 0;
     private int cooldownTicks;
 
     public HunterIllagerEntity(EntityType<HunterIllagerEntity> type, World worldIn) {
@@ -161,12 +160,14 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
     }
 
     protected void setEnchantmentBasedOnDifficulty(DifficultyInstance difficulty) {
-        float f = difficulty.getClampedAdditionalDifficulty();
-        if (!this.getHeldItemMainhand().isEmpty() && this.rand.nextFloat() < 0.3F * f) {
-            this.setItemStackToSlot(EquipmentSlotType.MAINHAND, EnchantmentHelper.addRandomEnchantment(this.rand, this.getHeldItemMainhand(), (int) (5.0F + f * (float) this.rand.nextInt(18)), false));
-        } else {
-            if (!this.getHeldItemMainhand().isEmpty() && this.rand.nextFloat() < 0.3F) {
-                this.setItemStackToSlot(EquipmentSlotType.MAINHAND, EnchantmentHelper.addRandomEnchantment(this.rand, this.getHeldItemMainhand(), (int) (5.0F + this.rand.nextInt(10)), false));
+        super.setEnchantmentBasedOnDifficulty(difficulty);
+
+        if (this.getHeldItemMainhand().getItem() == HunterItems.BOOMERANG && !this.getHeldItemMainhand().isEnchanted()) {
+            if (!this.getHeldItemMainhand().isEmpty()) {
+                Map<Enchantment, Integer> map = Maps.newHashMap();
+                map.put(Enchantments.LOYALTY, 1);
+
+                EnchantmentHelper.setEnchantments(map, this.getHeldItemMainhand());
             }
         }
     }

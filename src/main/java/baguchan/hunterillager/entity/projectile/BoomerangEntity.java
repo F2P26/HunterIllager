@@ -109,7 +109,6 @@ public class BoomerangEntity extends ThrowableEntity {
 
                 double speed = this.getSpeed();
 
-                //TODO
                 //this.world.playSound(null, this.getPosX(), this.getPosY(), this.getPosZ(), HunterSounds.ITEM_BOOMERANG_HIT, SoundCategory.BLOCKS, 0.5F, 1.0F);
                 if (piercingLevel < 1 || entityHits >= piercingLevel || speed < 0.4F) {
                     returnToOwner = true;
