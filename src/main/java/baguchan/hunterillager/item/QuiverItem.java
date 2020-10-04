@@ -2,6 +2,7 @@ package baguchan.hunterillager.item;
 
 import baguchan.hunterillager.init.HunterItems;
 import com.google.common.collect.Lists;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArrowItem;
@@ -11,8 +12,13 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class QuiverItem extends ArrowItem {
@@ -148,4 +154,14 @@ public class QuiverItem extends ArrowItem {
         }
     }
 
+    @OnlyIn(Dist.CLIENT)
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        List<ItemStack> list = getProjectiles(stack);
+        if (!list.isEmpty()) {
+            for (int i = 0; i < list.size(); ++i) {
+                ItemStack itemstack = list.get(i);
+                tooltip.add((new TranslationTextComponent("item.minecraft.crossbow.projectile")).appendString(" ").append(itemstack.getTextComponent()));
+            }
+        }
+    }
 }
