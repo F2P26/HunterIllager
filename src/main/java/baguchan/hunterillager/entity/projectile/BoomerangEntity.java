@@ -173,7 +173,7 @@ public class BoomerangEntity extends ThrowableEntity {
         BlockPos pos = result.getPos();
         BlockState state = this.world.getBlockState(pos);
         SoundType soundType = state.getSoundType(this.world, pos, this);
-        if (this.isReturning()) {
+        if (!this.isReturning()) {
             this.world.playSound(null, this.getPosX(), this.getPosY(), this.getPosZ(), soundType.getHitSound(), SoundCategory.BLOCKS, soundType.getVolume() * 0.26f, soundType.getPitch());
         }
         //this.world.playSound(null, this.getPosX(), this.getPosY(), this.getPosZ(), HunterSounds.ITEM_BOOMERANG_HIT, SoundCategory.BLOCKS, 0.5F, 1.0F);
