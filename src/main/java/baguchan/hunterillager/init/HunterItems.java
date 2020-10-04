@@ -16,7 +16,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 public class HunterItems {
     public static final Item SPAWNEGG_HUNTERILLAGER = new SpawnEggItem(HunterEntityRegistry.HUNTERILLAGER,  9804699, 0x582827, new Item.Properties().group(ItemGroup.MISC));
     public static final Item BOOMERANG = new BoomerangItem(new Item.Properties().group(ItemGroup.COMBAT).maxDamage(384));
-    public static final Item QUIVER = new QuiverItem(new Item.Properties().group(ItemGroup.COMBAT));
+    public static final Item QUIVER = new QuiverItem(new Item.Properties().group(ItemGroup.COMBAT).maxStackSize(1));
 
 
     public static void register(IForgeRegistry<Item> registry, Item item, String id) {
@@ -29,6 +29,7 @@ public class HunterItems {
     public static void registerItems(RegistryEvent.Register<Item> registry) {
         register(registry.getRegistry(), SPAWNEGG_HUNTERILLAGER, "spawnegg_hunterillager");
         register(registry.getRegistry(), BOOMERANG, "boomerang");
+        register(registry.getRegistry(), QUIVER, "quivers");
     }
 
 }
