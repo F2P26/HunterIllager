@@ -163,7 +163,7 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         super.setEnchantmentBasedOnDifficulty(difficulty);
 
         if (this.getHeldItemMainhand().getItem() == HunterItems.BOOMERANG && !this.getHeldItemMainhand().isEnchanted()) {
-            if (!this.getHeldItemMainhand().isEmpty()) {
+            if (!this.getHeldItemMainhand().isEmpty() && this.rand.nextFloat() < 0.25F) {
                 Map<Enchantment, Integer> map = Maps.newHashMap();
                 map.put(Enchantments.LOYALTY, 1);
 
