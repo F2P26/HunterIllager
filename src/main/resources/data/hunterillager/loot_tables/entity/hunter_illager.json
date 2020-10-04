@@ -57,6 +57,16 @@
           ]
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "name": "quivers",
+      "entries": [
+        {
+          "type": "item",
+          "name": "hunterillager:quivers"
+        }
+      ]
     }
   ]
 }
