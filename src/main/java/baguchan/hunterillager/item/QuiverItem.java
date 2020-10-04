@@ -160,7 +160,7 @@ public class QuiverItem extends ArrowItem {
         if (!list.isEmpty()) {
             for (int i = 0; i < list.size(); ++i) {
                 ItemStack itemstack = list.get(i);
-                tooltip.add((new TranslationTextComponent("item.minecraft.crossbow.projectile")).appendString(" ").append(itemstack.getTextComponent()));
+                tooltip.add((new TranslationTextComponent("item.minecraft.crossbow.projectile")).appendString(" ").append(itemstack.getTextComponent()).appendString(" *" + itemstack.getCount()));
             }
         }
     }

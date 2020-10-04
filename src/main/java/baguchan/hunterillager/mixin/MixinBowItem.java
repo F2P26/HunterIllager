@@ -36,7 +36,7 @@ public abstract class MixinBowItem extends ShootableItem {
             boolean flag = playerentity.abilities.isCreativeMode || EnchantmentHelper.getEnchantmentLevel(Enchantments.INFINITY, stack) > 0;
             ItemStack itemstack = playerentity.findAmmo(stack);
 
-            if (!flag2 && itemstack.getItem() == HunterItems.QUIVER) {
+            if (itemstack.getItem() == HunterItems.QUIVER) {
                 QuiverItem quiverItem = (QuiverItem) itemstack.getItem();
 
                 if (!quiverItem.hasArrow(itemstack, playerentity)) {
@@ -102,8 +102,11 @@ public abstract class MixinBowItem extends ShootableItem {
                         if (itemstack.isEmpty()) {
                             playerentity.inventory.deleteStack(itemstack);
                         }
-                    } else if (!flag2 && itemstack.getItem() == HunterItems.QUIVER) {
-                        QuiverItem.consumeProjectiles(itemstack);
+                    }
+                    ItemStack itemstack2 = playerentity.findAmmo(stack);
+
+                    if (!flag2 && itemstack2.getItem() == HunterItems.QUIVER) {
+                        QuiverItem.consumeProjectiles(itemstack2);
                     }
 
                     playerentity.addStat(Stats.ITEM_USED.get(this));
