@@ -39,7 +39,7 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
         p_230363_5_.nextInt();
         for (int k = p_230363_6_ - 10; k <= p_230363_6_ + 10; ++k) {
             for (int l = p_230363_7_ - 10; l <= p_230363_7_ + 10; ++l) {
-                ChunkPos chunkpos = Structure.field_236381_q_.func_236392_a_(p_230363_1_.func_235957_b_().func_236197_a_(Structure.field_236381_q_), p_230363_3_, p_230363_5_, k, l);
+                ChunkPos chunkpos = Structure.VILLAGE.getChunkPosForStructure(p_230363_1_.func_235957_b_().func_236197_a_(Structure.VILLAGE), p_230363_3_, p_230363_5_, k, l);
                 if (k == chunkpos.x && l == chunkpos.z) {
                     return false;
                 }

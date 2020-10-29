@@ -127,7 +127,6 @@ public abstract class MixinBowItem extends ShootableItem {
         return f;
     }
 
-    @Shadow
     public AbstractArrowEntity customArrow(AbstractArrowEntity arrow) {
         return arrow;
     }
