@@ -6,7 +6,8 @@
   "refmap": "hunterillager.refmap.json",
   "mixins": [
     "MixinPatrolSpawner",
-    "MixinBowItem"
+    "MixinBowItem",
+    "MixinCrossBowItem"
   ],
   "injectors": {
     "defaultRequire": 1
