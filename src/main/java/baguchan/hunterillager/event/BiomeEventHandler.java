@@ -14,13 +14,11 @@ public class BiomeEventHandler {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void addSpawn(BiomeLoadingEvent event) {
         if (HunterConfig.generateHunterHouse) {
-            if (event.getName().getNamespace().toString().contains("minecraft") || event.getName().getNamespace().toString().contains("biomesoplenty")) {
+            if (event.getName().getNamespace().contains("minecraft") || event.getName().getNamespace().contains("biomesoplenty")) {
                 if (event.getCategory() == Biome.Category.FOREST || event.getCategory() == Biome.Category.PLAINS) {
                     event.getGeneration().withStructure(StructureRegister.HUNTER_HOUSE);
                 }
-
             }
-
         }
     }
 }

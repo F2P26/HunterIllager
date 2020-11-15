@@ -99,25 +99,26 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         this.goalSelector.addGoal(0, new SwimGoal(this));
         this.goalSelector.addGoal(1, new OpenDoorGoal(this, true));
         this.goalSelector.addGoal(2, new EatOffhandFoodGoal<>(this));
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 0.85F, false) {
-            @Override
-            public boolean shouldExecute() {
-                return !isHolding(Items.BOW) && !isHolding(HunterItems.BOOMERANG) && super.shouldExecute();
-            }
-        });
-        this.goalSelector.addGoal(3, new RangedAggroedAttackGoal(this, 0.7D, 40, 16.0F) {
+        this.goalSelector.addGoal(3, new AbstractRaiderEntity.FindTargetGoal(this, 10.0F));
+        this.goalSelector.addGoal(4, new RangedAggroedAttackGoal(this, 0.7D, 40, 16.0F) {
             @Override
             public boolean shouldExecute() {
                 return !isHolding(Items.BOW) && isHolding(HunterItems.BOOMERANG) && super.shouldExecute();
             }
         });
-        this.goalSelector.addGoal(3, new RangedBowAttackGoal(this, 0.7D, 25, 15.0F) {
+        this.goalSelector.addGoal(4, new RangedBowAttackGoal(this, 0.7D, 25, 15.0F) {
             @Override
             public boolean shouldExecute() {
                 return isHolding(Items.BOW) && !isHolding(HunterItems.BOOMERANG) && super.shouldExecute();
             }
         });
-        this.goalSelector.addGoal(4, new MoveToFoodGoal<>(this));
+        this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 0.9F, false) {
+            @Override
+            public boolean shouldExecute() {
+                return !isHolding(Items.BOW) && !isHolding(HunterItems.BOOMERANG) && super.shouldExecute();
+            }
+        });
+        this.goalSelector.addGoal(5, new MoveToFoodGoal<>(this));
         this.goalSelector.addGoal(6, new WakeUpGoal(this));
         this.goalSelector.addGoal(7, new GotoBedGoal(this, 0.7D));
         this.goalSelector.addGoal(8, new MoveToGoal(this, 10.0D, 0.7D));
@@ -154,8 +155,8 @@ public class HunterIllagerEntity extends AbstractIllagerEntity implements IRange
         if (this.world.rand.nextFloat() < 0.6F) {
             this.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.BOW));
         } else {
-            this.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(HunterItems.BOOMERANG));
-            this.inventory.addItem(new ItemStack(HunterItems.BOOMERANG));
+            this.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.WOODEN_SWORD));
+            this.setItemStackToSlot(EquipmentSlotType.OFFHAND, new ItemStack(HunterItems.BOOMERANG));
         }
     }
 
