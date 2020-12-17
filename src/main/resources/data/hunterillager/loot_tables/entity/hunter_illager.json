@@ -64,7 +64,16 @@
       "entries": [
         {
           "type": "item",
-          "name": "hunterillager:quivers"
+          "name": "hunterillager:quivers",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 0,
+                "max": 1
+              }
+            }
+          ]
         }
       ]
     }
