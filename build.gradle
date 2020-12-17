@@ -20,7 +20,7 @@ mixin {
     add sourceSets.main, "hunterillager.refmap.json"
 }
 
-version = '1.16.4-1.1.4'
+version = '1.16.4-1.2.0'
 group = 'baguchan.hunterillager' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'hunterillager'
 
