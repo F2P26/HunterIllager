@@ -12,16 +12,12 @@ buildscript {
 }
 
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
 mixin {
     add sourceSets.main, "hunterillager.refmap.json"
-}
-
-tasks.withType(Jar) {
-    compileJava.options.encoding = 'UTF-8'
-    compileJava.options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }
 
 version = '1.16.4-1.1.4'
@@ -86,7 +82,7 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
 
-    minecraft 'net.minecraftforge:forge:1.16.4-35.0.15'
+    minecraft 'net.minecraftforge:forge:1.16.4-35.0.18'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

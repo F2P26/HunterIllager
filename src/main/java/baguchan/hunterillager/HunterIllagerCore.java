@@ -10,7 +10,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-@Mod("hunterillager")
+@Mod(HunterIllagerCore.MODID)
 public class HunterIllagerCore {
     public static final String MODID = "hunterillager";
     public static HunterIllagerCore instance;

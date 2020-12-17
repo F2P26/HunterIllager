@@ -53,10 +53,10 @@ public class HunterHouseStructure extends Structure<NoFeatureConfig> {
         return HunterHouseStructure.Start::new;
     }
 
-    public GenerationStage.Decoration func_236396_f_() {
+    @Override
+    public GenerationStage.Decoration getDecorationStage() {
         return GenerationStage.Decoration.SURFACE_STRUCTURES;
     }
-
 
     public static class Start extends StructureStart<NoFeatureConfig> {
         public Start(Structure<NoFeatureConfig> p_i225806_1_, int p_i225806_2_, int p_i225806_3_, MutableBoundingBox p_i225806_4_, int p_i225806_5_, long p_i225806_6_) {
