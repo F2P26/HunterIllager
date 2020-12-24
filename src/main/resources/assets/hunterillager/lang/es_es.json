@@ -1,0 +1,12 @@
+{
+  "item.hunterillager.spawnegg_hunterillager": "Generar cazador",
+  "item.hunterillager.quivers": "Carcaj",
+  "item.hunterillager.boomerang": "Búmeran",
+  "container.hunterillager.quivers": "Carcaj",
+  "entity.hunterillager.hunterillager": "Cazador",
+  "subtitles.hunterillager.laugh": "Risa de cazador",
+  "death.attack.hunterillager.boomerang": "%1$s fue golpeado por el búmeran",
+  "death.attack.hunterillager.boomerang.player": "%1$s fue golpeado por el búmeran de %2$s",
+  "hunterillager.config.generateHunterHouse": "Generar casa de cazador en el overworld",
+  "hunterillager.config.spawnHunterIllagerOnPatrol": "Generar cazador en patrulla"
+}
